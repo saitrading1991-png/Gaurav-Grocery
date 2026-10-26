@@ -6,9 +6,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -40,65 +40,39 @@ data class Grocery(
     val category: String,
     val unit: String,
     val price: Int,
-    val emoji: String,
     val imageUrl: String
 )
 
 private val groceries = listOf(
-    Grocery(
-        1, "Tomatoes", "Vegetables", "1 kg", 30, "🍅",
-        "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        2, "Potatoes", "Vegetables", "1 kg", 35, "🥔",
-        "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        3, "Onions", "Vegetables", "1 kg", 40, "🧅",
-        "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        4, "Bananas", "Fruits", "1 dozen", 50, "🍌",
-        "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        5, "Apples", "Fruits", "1 kg", 140, "🍎",
-        "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        6, "Oranges", "Fruits", "1 kg", 80, "🍊",
-        "https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        7, "Milk", "Dairy", "1 litre", 60, "🥛",
-        "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        8, "Curd", "Dairy", "400 g", 35, "🥣",
-        "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        9, "Rice", "Staples", "1 kg", 65, "🍚",
-        "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        10, "Wheat Flour", "Staples", "5 kg", 240, "🌾",
-        "https://images.unsplash.com/photo-1627485937980-221c88ac04f9?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        11, "Eggs", "Dairy", "6 pieces", 55, "🥚",
-        "https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?auto=format&fit=crop&w=400&q=80"
-    ),
-    Grocery(
-        12, "Cooking Oil", "Staples", "1 litre", 145, "🫒",
-        "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80"
-    )
+    Grocery(1, "Tomatoes", "Vegetables", "1 kg", 30,
+        "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=400&q=80"),
+    Grocery(2, "Potatoes", "Vegetables", "1 kg", 35,
+        "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=400&q=80"),
+    Grocery(3, "Onions", "Vegetables", "1 kg", 40,
+        "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=400&q=80"),
+    Grocery(4, "Bananas", "Fruits", "1 dozen", 50,
+        "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80"),
+    Grocery(5, "Apples", "Fruits", "1 kg", 140,
+        "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80"),
+    Grocery(6, "Oranges", "Fruits", "1 kg", 80,
+        "https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=400&q=80"),
+    Grocery(7, "Milk", "Dairy", "1 litre", 60,
+        "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80"),
+    Grocery(8, "Curd", "Dairy", "400 g", 35,
+        "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=400&q=80"),
+    Grocery(9, "Rice", "Staples", "1 kg", 65,
+        "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80"),
+    Grocery(10, "Wheat Flour", "Staples", "5 kg", 240,
+        "https://images.unsplash.com/photo-1627485937980-221c88ac04f9?auto=format&fit=crop&w=400&q=80"),
+    Grocery(11, "Eggs", "Dairy", "6 pieces", 55,
+        "https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?auto=format&fit=crop&w=400&q=80"),
+    Grocery(12, "Cooking Oil", "Staples", "1 litre", 145,
+        "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80")
 )
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             MaterialTheme {
                 GroceryApp()
@@ -118,21 +92,19 @@ fun GroceryApp() {
 
     val cart = remember { mutableStateMapOf<Int, Int>() }
 
-    val categories = listOf("All", "Vegetables", "Fruits", "Dairy", "Staples")
+    val categories = listOf(
+        "All", "Vegetables", "Fruits", "Dairy", "Staples"
+    )
 
     val filteredGroceries = groceries.filter { grocery ->
-        val matchesSearch = grocery.name.contains(
-            searchText,
-            ignoreCase = true
-        )
-        val matchesCategory =
-            selectedCategory == "All" ||
-            grocery.category == selectedCategory
-
-        matchesSearch && matchesCategory
+        grocery.name.contains(searchText, ignoreCase = true) &&
+            (selectedCategory == "All" ||
+                grocery.category == selectedCategory)
     }
 
-    val cartItems = groceries.filter { cart.getOrDefault(it.id, 0) > 0 }
+    val cartItems = groceries.filter {
+        cart.getOrDefault(it.id, 0) > 0
+    }
 
     val totalItems = cart.values.sum()
 
@@ -183,7 +155,7 @@ fun GroceryApp() {
             }
         },
         bottomBar = {
-            if (totalItems > 0 && !showCheckout) {
+            if (totalItems > 0 && !showCheckout && !showCart) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -192,11 +164,7 @@ fun GroceryApp() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            "$totalItems items",
-                            color = Ink,
-                            fontSize = 13.sp
-                        )
+                        Text("$totalItems items", color = Ink, fontSize = 13.sp)
                         Text(
                             "₹$totalPrice",
                             color = Green,
@@ -206,10 +174,7 @@ fun GroceryApp() {
                     }
 
                     Button(
-                        onClick = {
-                            showCart = true
-                            showCheckout = false
-                        },
+                        onClick = { showCart = true },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Green
                         )
@@ -220,7 +185,6 @@ fun GroceryApp() {
             }
         }
     ) { padding ->
-
         when {
             showCheckout -> {
                 CheckoutScreen(
@@ -232,7 +196,6 @@ fun GroceryApp() {
                             "Demo order placed successfully!",
                             Toast.LENGTH_LONG
                         ).show()
-
                         cart.clear()
                         showCart = false
                         showCheckout = false
@@ -271,7 +234,6 @@ fun GroceryApp() {
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
-
                     Text(
                         "Everyday essentials at listed prices",
                         color = Color.Gray,
@@ -297,15 +259,13 @@ fun GroceryApp() {
 
                     Spacer(Modifier.height(12.dp))
 
-                    androidx.compose.foundation.lazy.LazyRow(
+                    LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(categories) { category ->
                             FilterChip(
                                 selected = selectedCategory == category,
-                                onClick = {
-                                    selectedCategory = category
-                                },
+                                onClick = { selectedCategory = category },
                                 label = { Text(category) },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = PaleGreen,
@@ -333,7 +293,6 @@ fun GroceryApp() {
                                 onRemove = {
                                     val current =
                                         cart.getOrDefault(grocery.id, 0)
-
                                     if (current <= 1) {
                                         cart.remove(grocery.id)
                                     } else {
@@ -392,21 +351,9 @@ fun GroceryRow(
                 fontSize = 16.sp,
                 color = Ink
             )
-
-            Text(
-                grocery.category,
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
-
-            Text(
-                grocery.unit,
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
-
+            Text(grocery.category, color = Color.Gray, fontSize = 12.sp)
+            Text(grocery.unit, color = Color.Gray, fontSize = 12.sp)
             Spacer(Modifier.height(4.dp))
-
             Text(
                 "₹${grocery.price}",
                 color = Green,
@@ -441,13 +388,7 @@ fun GroceryRow(
                         contentDescription = "Remove one"
                     )
                 }
-
-                Text(
-                    "$quantity",
-                    fontWeight = FontWeight.Bold,
-                    color = Ink
-                )
-
+                Text("$quantity", fontWeight = FontWeight.Bold, color = Ink)
                 IconButton(onClick = onAdd) {
                     Icon(
                         Icons.Default.Add,
@@ -475,12 +416,8 @@ fun CartScreen(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Back"
-                )
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
-
             Text(
                 "Your Cart",
                 fontSize = 23.sp,
@@ -504,10 +441,7 @@ fun CartScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                Color.White,
-                                RoundedCornerShape(12.dp)
-                            )
+                            .background(Color.White, RoundedCornerShape(12.dp))
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -524,10 +458,7 @@ fun CartScreen(
                         Spacer(Modifier.width(12.dp))
 
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                grocery.name,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Text(grocery.name, fontWeight = FontWeight.Bold)
                             Text("$qty × ₹${grocery.price}")
                         }
 
@@ -546,11 +477,7 @@ fun CartScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    "Total",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("Total", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))
                 Text(
                     "₹$totalPrice",
@@ -582,6 +509,8 @@ fun CheckoutScreen(
     onPlaceOrder: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     var customerName by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
@@ -593,8 +522,50 @@ fun CheckoutScreen(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Back"
-                )
-     
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            }
+            Text(
+                "Checkout",
+                fontSize = 23.sp,
+                fontWeight = FontWeight.Bold,
+                color = Ink
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = customerName,
+            onValueChange = { customerName = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Full name") },
+            singleLine = true
+        )
+
+        Spacer(Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Phone number") },
+            singleLine = true
+        )
+
+        Spacer(Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = address,
+            onValueChange = { address = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Delivery address") },
+            minLines = 3
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Text(
+            "Order total: ₹$totalPrice",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color 
