@@ -538,6 +538,123 @@ fun CartScreen(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(60.dp)
+            Spacer(Modifier.height(12.dp))
+
+            Button(
+                onClick = onCheckout,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Green
+                )
+            ) {
+                Text("Proceed to Checkout")
+            }
+        }
+    }
+}
+@Composable
+fun CheckoutScreen(
+    totalPrice: Int,
+    onBack: () -> Unit,
+    onPlaceOrder: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    var customerName by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+
+            Text(
+                text = "Checkout",
+                fontSize = 23.sp,
+                fontWeight = FontWeight.Bold,
+                color = Ink
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = customerName,
+            onValueChange = { customerName = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Full name") },
+            singleLine = true
+        )
+
+        Spacer(Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Phone number") },
+            singleLine = true
+        )
+
+        Spacer(Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = address,
+            onValueChange = { address = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Delivery address") },
+            minLines = 3
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Text(
+            text = "Order total: ₹$totalPrice",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Green
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                if (
+                    customerName.isNotBlank() &&
+                    phone.isNotBlank() &&
+                    address.isNotBlank()
+                ) {
+                    onPlaceOrder()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Please fill all details",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Green
+            )
+        ) {
+            Text("Place Order")
+        }
+    }
+}
+
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(PaleGreen)
                         )
