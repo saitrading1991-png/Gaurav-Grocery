@@ -1,3 +1,4 @@
+
 package com.gauravgrocery.app
 
 import android.os.Bundle
@@ -73,7 +74,6 @@ private val groceries = listOf(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             MaterialTheme {
                 GroceryApp()
@@ -94,29 +94,22 @@ fun GroceryApp() {
     val cart = remember { mutableStateMapOf<Int, Int>() }
 
     val categories = listOf(
-        "All",
-        "Vegetables",
-        "Fruits",
-        "Dairy",
-        "Staples"
+        "All", "Vegetables", "Fruits", "Dairy", "Staples"
     )
 
-    val filteredGroceries = groceries.filter { grocery ->
-        grocery.name.contains(searchText, ignoreCase = true) &&
-            (
-                selectedCategory == "All" ||
-                    grocery.category == selectedCategory
-                )
+    val filteredGroceries = groceries.filter { item ->
+        item.name.contains(searchText, ignoreCase = true) &&
+            (selectedCategory == "All" ||
+                item.category == selectedCategory)
     }
 
-    val cartItems = groceries.filter { grocery ->
-        cart.getOrDefault(grocery.id, 0) > 0
+    val cartItems = groceries.filter {
+        cart.getOrDefault(it.id, 0) > 0
     }
 
     val totalItems = cart.values.sum()
-
-    val totalPrice = cartItems.sumOf { grocery ->
-        grocery.price * cart.getOrDefault(grocery.id, 0)
+    val totalPrice = cartItems.sumOf {
+        it.price * cart.getOrDefault(it.id, 0)
     }
 
     Scaffold(
@@ -129,16 +122,13 @@ fun GroceryApp() {
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Gaurav Grocery",
                         color = Color.White,
                         fontSize = 23.sp,
                         fontWeight = FontWeight.Bold
                     )
-
                     Text(
                         text = "Fresh groceries, delivered with care",
                         color = Color.White.copy(alpha = 0.9f),
@@ -148,11 +138,10 @@ fun GroceryApp() {
 
                 IconButton(
                     onClick = {
-                        if (showCart) {
+                        if (showCart || showCheckout) {
                             showCart = false
                             showCheckout = false
                         } else {
-                            showCheckout = false
                             showCart = true
                         }
                     }
@@ -172,11 +161,7 @@ fun GroceryApp() {
             }
         },
         bottomBar = {
-            if (
-                totalItems > 0 &&
-                !showCheckout &&
-                !showCart
-            ) {
+            if (totalItems > 0 && !showCart && !showCheckout) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -184,23 +169,15 @@ fun GroceryApp() {
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "$totalItems items",
-                            color = Ink,
-                            fontSize = 13.sp
-                        )
-
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("$totalItems items", color = Ink)
                         Text(
                             text = "₹$totalPrice",
                             color = Green,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
-
                     Button(
                         onClick = { showCart = true },
                         colors = ButtonDefaults.buttonColors(
@@ -213,7 +190,6 @@ fun GroceryApp() {
             }
         }
     ) { padding ->
-
         when {
             showCheckout -> {
                 CheckoutScreen(
@@ -225,7 +201,6 @@ fun GroceryApp() {
                             "Demo order placed successfully!",
                             Toast.LENGTH_LONG
                         ).show()
-
                         cart.clear()
                         showCart = false
                         showCheckout = false
@@ -243,6 +218,17 @@ fun GroceryApp() {
                     onCheckout = {
                         if (cartItems.isNotEmpty()) {
                             showCheckout = true
+                        }
+                    },
+                    onAdd = { id ->
+                        cart[id] = cart.getOrDefault(id, 0) + 1
+                    },
+                    onRemove = { id ->
+                        val count = cart.getOrDefault(id, 0)
+                        if (count <= 1) {
+                            cart.remove(id)
+                        } else {
+                            cart[id] = count - 1
                         }
                     },
                     modifier = Modifier.padding(padding)
@@ -264,7 +250,6 @@ fun GroceryApp() {
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
-
                     Text(
                         text = "Everyday essentials at listed prices",
                         color = Color.Gray,
@@ -277,9 +262,7 @@ fun GroceryApp() {
                         value = searchText,
                         onValueChange = { searchText = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text("Search groceries...")
-                        },
+                        placeholder = { Text("Search groceries...") },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
@@ -293,22 +276,17 @@ fun GroceryApp() {
                     Spacer(Modifier.height(12.dp))
 
                     LazyRow(
-                        horizontalArrangement =
-                            Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(categories) { category ->
                             FilterChip(
-                                selected =
-                                    selectedCategory == category,
-                                onClick = {
-                                    selectedCategory = category
-                                },
+                                selected = selectedCategory == category,
+                                onClick = { selectedCategory = category },
                                 label = { Text(category) },
-                                colors =
-                                    FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = PaleGreen,
-                                        selectedLabelColor = Green
-                                    )
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = PaleGreen,
+                                    selectedLabelColor = Green
+                                )
                             )
                         }
                     }
@@ -317,31 +295,27 @@ fun GroceryApp() {
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement =
-                            Arrangement.spacedBy(10.dp),
-                        contentPadding =
-                            PaddingValues(bottom = 18.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(bottom = 18.dp)
                     ) {
                         items(
-                            filteredGroceries,
+                            items = filteredGroceries,
                             key = { it.id }
-                        ) { grocery ->
+                        ) { item ->
                             GroceryRow(
-                                grocery = grocery,
-                                quantity =
-                                    cart.getOrDefault(grocery.id, 0),
+                                grocery = item,
+                                quantity = cart.getOrDefault(item.id, 0),
                                 onAdd = {
-                                    cart[grocery.id] =
-                                        cart.getOrDefault(grocery.id, 0) + 1
+                                    cart[item.id] =
+                                        cart.getOrDefault(item.id, 0) + 1
                                 },
                                 onRemove = {
-                                    val current =
-                                        cart.getOrDefault(grocery.id, 0)
-
-                                    if (current <= 1) {
-                                        cart.remove(grocery.id)
+                                    val count =
+                                        cart.getOrDefault(item.id, 0)
+                                    if (count <= 1) {
+                                        cart.remove(item.id)
                                     } else {
-                                        cart[grocery.id] = current - 1
+                                        cart[item.id] = count - 1
                                     }
                                 }
                             )
@@ -373,10 +347,7 @@ fun GroceryRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Color.White,
-                RoundedCornerShape(16.dp)
-            )
+            .background(Color.White, RoundedCornerShape(16.dp))
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -392,30 +363,16 @@ fun GroceryRow(
 
         Spacer(Modifier.width(12.dp))
 
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = grocery.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Ink
             )
-
-            Text(
-                text = grocery.category,
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
-
-            Text(
-                text = grocery.unit,
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
-
+            Text(grocery.category, color = Color.Gray, fontSize = 12.sp)
+            Text(grocery.unit, color = Color.Gray, fontSize = 12.sp)
             Spacer(Modifier.height(4.dp))
-
             Text(
                 text = "₹${grocery.price}",
                 color = Green,
@@ -431,8 +388,8 @@ fun GroceryRow(
                     containerColor = Green
                 ),
                 contentPadding = PaddingValues(
-                    horizontal = 16.dp,
-                    vertical = 8.dp
+                    horizontal = 12.dp,
+                    vertical = 6.dp
                 )
             ) {
                 Text("ADD")
@@ -441,10 +398,7 @@ fun GroceryRow(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .background(
-                        PaleGreen,
-                        RoundedCornerShape(10.dp)
-                    )
+                    .background(PaleGreen, RoundedCornerShape(10.dp))
                     .padding(horizontal = 2.dp)
             ) {
                 IconButton(onClick = onRemove) {
@@ -453,13 +407,11 @@ fun GroceryRow(
                         contentDescription = "Remove one"
                     )
                 }
-
                 Text(
                     text = "$quantity",
                     fontWeight = FontWeight.Bold,
                     color = Ink
                 )
-
                 IconButton(onClick = onAdd) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -478,6 +430,8 @@ fun CartScreen(
     totalPrice: Int,
     onBack: () -> Unit,
     onCheckout: () -> Unit,
+    onAdd: (Int) -> Unit,
+    onRemove: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -485,16 +439,13 @@ fun CartScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back"
                 )
             }
-
             Text(
                 text = "Your Cart",
                 fontSize = 23.sp,
@@ -506,21 +457,17 @@ fun CartScreen(
         Spacer(Modifier.height(12.dp))
 
         if (cartItems.isEmpty()) {
-            Text(
-                text = "Your cart is empty.",
-                color = Color.Gray
-            )
+            Text("Your cart is empty.", color = Color.Gray)
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement =
-                    Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(
-                    cartItems,
+                    items = cartItems,
                     key = { it.id }
-                ) { grocery ->
-                    val qty = cart.getOrDefault(grocery.id, 0)
+                ) { item ->
+                    val qty = cart.getOrDefault(item.id, 0)
 
                     Row(
                         modifier = Modifier
@@ -529,161 +476,60 @@ fun CartScreen(
                                 Color.White,
                                 RoundedCornerShape(12.dp)
                             )
-                            .padding(12.dp),
+                            .padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         AsyncImage(
-                            model = grocery.imageUrl,
-                            contentDescription = grocery.name,
+                            model = item.imageUrl,
+                            contentDescription = item.name,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(60.dp)
-            Spacer(Modifier.height(12.dp))
-
-            Button(
-                onClick = onCheckout,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Green
-                )
-            ) {
-                Text("Proceed to Checkout")
-            }
-        }
-    }
-}
-@Composable
-fun CheckoutScreen(
-    totalPrice: Int,
-    onBack: () -> Unit,
-    onPlaceOrder: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-
-    var customerName by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
-
-            Text(
-                text = "Checkout",
-                fontSize = 23.sp,
-                fontWeight = FontWeight.Bold,
-                color = Ink
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = customerName,
-            onValueChange = { customerName = it },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Full name") },
-            singleLine = true
-        )
-
-        Spacer(Modifier.height(10.dp))
-
-        OutlinedTextField(
-            value = phone,
-            onValueChange = { phone = it },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Phone number") },
-            singleLine = true
-        )
-
-        Spacer(Modifier.height(10.dp))
-
-        OutlinedTextField(
-            value = address,
-            onValueChange = { address = it },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Delivery address") },
-            minLines = 3
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-        Text(
-            text = "Order total: ₹$totalPrice",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Green
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                if (
-                    customerName.isNotBlank() &&
-                    phone.isNotBlank() &&
-                    address.isNotBlank()
-                ) {
-                    onPlaceOrder()
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Please fill all details",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Green
-            )
-        ) {
-            Text("Place Order")
-        }
-    }
-}
-
+                                .size(58.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(PaleGreen)
                         )
 
-                        Spacer(Modifier.width(12.dp))
+                        Spacer(Modifier.width(10.dp))
 
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = grocery.name,
+                                text = item.name,
                                 fontWeight = FontWeight.Bold
                             )
-
                             Text(
-                                text = "$qty × ₹${grocery.price}"
+                                text = "₹${item.price} / ${item.unit}",
+                                color = Color.Gray,
+                                fontSize = 12.sp
+                            )
+                            Text(
+                                text = "Subtotal: ₹${item.price * qty}",
+                                color = Green,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        IconButton(onClick = { onRemove(item.id) }) {
+                            Icon(
+                                imageVector = Icons.Default.Remove,
+                                contentDescription = "Remove item"
                             )
                         }
 
                         Text(
-                            text = "₹${qty * grocery.price}",
-                            color = Green,
+                            text = "$qty",
                             fontWeight = FontWeight.Bold
                         )
+
+                        IconButton(onClick = { onAdd(item.id) }) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add item"
+                            )
+                        }
                     }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -694,15 +540,8 @@ fun CheckoutScreen(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-
                 Spacer(Modifier.weight(1f))
-
                 Text(
                     text = "₹$totalPrice",
                     fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Green
-                )
-            }
-
-       
+                    fontWeight = FontW
