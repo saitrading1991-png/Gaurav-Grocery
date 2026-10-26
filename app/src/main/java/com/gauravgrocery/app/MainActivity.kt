@@ -1,4 +1,3 @@
-
 package com.gauravgrocery.app
 
 import android.os.Bundle
