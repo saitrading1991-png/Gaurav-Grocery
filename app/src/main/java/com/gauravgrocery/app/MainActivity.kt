@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -72,8 +73,6 @@ private val groceries = listOf(
         "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80")
 )
 
-// Firebase references
-
 private val auth: FirebaseAuth by lazy {
     FirebaseAuth.getInstance()
 }
@@ -105,16 +104,10 @@ private fun saveGroceryOrder(
         db.collection("orders")
             .add(order)
             .addOnSuccessListener { document ->
-                onResult(
-                    true,
-                    "Order saved successfully! ID: ${document.id}"
-                )
+                onResult(true, "Order saved successfully! ID: ${document.id}")
             }
             .addOnFailureListener { error ->
-                onResult(
-                    false,
-                    error.localizedMessage ?: "Could not save order"
-                )
+                onResult(false, error.localizedMessage ?: "Could not save order")
             }
     }
 
@@ -134,10 +127,7 @@ private fun saveGroceryOrder(
                 }
             }
             .addOnFailureListener { error ->
-                onResult(
-                    false,
-                    error.localizedMessage ?: "Anonymous sign-in failed"
-                )
+                onResult(false, error.localizedMessage ?: "Anonymous sign-in failed")
             }
     }
 }
@@ -145,7 +135,6 @@ private fun saveGroceryOrder(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             MaterialTheme {
                 GroceryApp()
@@ -166,25 +155,16 @@ fun GroceryApp() {
 
     val cart = remember { mutableStateMapOf<Int, Int>() }
 
-    val categories = listOf(
-        "All", "Vegetables", "Fruits", "Dairy", "Staples"
-    )
+    val categories = listOf("All", "Vegetables", "Fruits", "Dairy", "Staples")
 
     val filteredGroceries = groceries.filter { item ->
         item.name.contains(searchText, ignoreCase = true) &&
-            (selectedCategory == "All" ||
-                item.category == selectedCategory)
+            (selectedCategory == "All" || item.category == selectedCategory)
     }
 
-    val cartItems = groceries.filter {
-        cart.getOrDefault(it.id, 0) > 0
-    }
-
+    val cartItems = groceries.filter { cart.getOrDefault(it.id, 0) > 0 }
     val totalItems = cart.values.sum()
-
-    val totalPrice = cartItems.sumOf {
-        it.price * cart.getOrDefault(it.id, 0)
-    }
+    val totalPrice = cartItems.sumOf { it.price * cart.getOrDefault(it.id, 0) }
 
     Scaffold(
         containerColor = PageBackground,
@@ -196,42 +176,36 @@ fun GroceryApp() {
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Column(Modifier.weight(1f)) {
                     Text(
-                        text = "Gaurav Grocery",
+                        "Gaurav Grocery",
                         color = Color.White,
                         fontSize = 23.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Fresh groceries, delivered with care",
+                        "Fresh groceries, delivered with care",
                         color = Color.White.copy(alpha = 0.9f),
                         fontSize = 12.sp
                     )
                 }
 
-                IconButton(
-                    onClick = {
-                        if (showCheckout) {
-                            showCheckout = false
-                            showCart = true
-                        } else {
-                            showCart = !showCart
-                        }
+                IconButton(onClick = {
+                    if (showCheckout) {
+                        showCheckout = false
+                        showCart = true
+                    } else {
+                        showCart = !showCart
                     }
-                ) {
+                }) {
                     Icon(
-                        imageVector = Icons.Default.ShoppingCart,
+                        Icons.Default.ShoppingCart,
                         contentDescription = "Shopping cart",
                         tint = Color.White
                     )
                 }
 
-                Text(
-                    text = "$totalItems",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("$totalItems", color = Color.White, fontWeight = FontWeight.Bold)
             }
         },
         bottomBar = {
@@ -243,21 +217,18 @@ fun GroceryApp() {
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(Modifier.weight(1f)) {
                         Text("$totalItems items", color = Ink)
                         Text(
-                            text = "₹$totalPrice",
+                            "₹$totalPrice",
                             color = Green,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
-
                     Button(
                         onClick = { showCart = true },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Green
-                        )
+                        colors = ButtonDefaults.buttonColors(containerColor = Green)
                     ) {
                         Text("View Cart")
                     }
@@ -269,46 +240,42 @@ fun GroceryApp() {
             showCheckout -> {
                 CheckoutScreen(
                     totalPrice = totalPrice,
-                    onBack = {
-                        showCheckout = false
-                    },
+                    onBack = { showCheckout = false },
                     isSaving = isSavingOrder,
-                    onPlaceOrder = { customerName, phone, address ->
-                        if (isSavingOrder) {
-                            return@CheckoutScreen
-                        }
+                    onPlaceOrder = { customerName: String, phone: String, address: String ->
+                        if (!isSavingOrder) {
+                            isSavingOrder = true
 
-                        isSavingOrder = true
+                            val orderItems: List<Map<String, Any>> =
+                                cartItems.map { item ->
+                                    mapOf(
+                                        "productId" to item.id,
+                                        "name" to item.name,
+                                        "unit" to item.unit,
+                                        "price" to item.price,
+                                        "quantity" to cart.getOrDefault(item.id, 0)
+                                    )
+                                }
 
-                        val orderItems = cartItems.map { item ->
-                            mapOf<String, Any>(
-                                "productId" to item.id,
-                                "name" to item.name,
-                                "unit" to item.unit,
-                                "price" to item.price,
-                                "quantity" to cart.getOrDefault(item.id, 0)
-                            )
-                        }
+                            saveGroceryOrder(
+                                customerName = customerName,
+                                phone = phone,
+                                address = address,
+                                items = orderItems,
+                                totalPrice = totalPrice.toLong()
+                            ) { success: Boolean, message: String ->
+                                isSavingOrder = false
+                                Toast.makeText(
+                                    context,
+                                    message,
+                                    Toast.LENGTH_LONG
+                                ).show()
 
-                        saveGroceryOrder(
-                            customerName = customerName,
-                            phone = phone,
-                            address = address,
-                            items = orderItems,
-                            totalPrice = totalPrice.toLong()
-                        ) { success, message ->
-                            isSavingOrder = false
-
-                            Toast.makeText(
-                                context,
-                                message,
-                                Toast.LENGTH_LONG
-                            ).show()
-
-                            if (success) {
-                                cart.clear()
-                                showCart = false
-                                showCheckout = false
+                                if (success) {
+                                    cart.clear()
+                                    showCart = false
+                                    showCheckout = false
+                                }
                             }
                         }
                     },
@@ -323,11 +290,8 @@ fun GroceryApp() {
                     totalPrice = totalPrice,
                     onBack = { showCart = false },
                     onQuantityChange = { id, quantity ->
-                        if (quantity <= 0) {
-                            cart.remove(id)
-                        } else {
-                            cart[id] = quantity
-                        }
+                        if (quantity <= 0) cart.remove(id)
+                        else cart[id] = quantity
                     },
                     onCheckout = {
                         if (cartItems.isNotEmpty()) {
@@ -353,11 +317,8 @@ fun GroceryApp() {
                     },
                     onRemove = { id ->
                         val quantity = cart.getOrDefault(id, 0)
-                        if (quantity <= 1) {
-                            cart.remove(id)
-                        } else {
-                            cart[id] = quantity - 1
-                        }
+                        if (quantity <= 1) cart.remove(id)
+                        else cart[id] = quantity - 1
                     },
                     modifier = Modifier.padding(padding)
                 )
@@ -392,10 +353,7 @@ fun ProductScreen(
                 .padding(top = 12.dp),
             placeholder = { Text("Search groceries") },
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
-                )
+                Icon(Icons.Default.Search, contentDescription = "Search")
             },
             singleLine = true,
             shape = RoundedCornerShape(14.dp)
@@ -403,9 +361,7 @@ fun ProductScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        androidx.compose.foundation.lazy.LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(categories) { category ->
                 FilterChip(
                     selected = selectedCategory == category,
@@ -419,10 +375,8 @@ fun ProductScreen(
             }
         }
 
-        Spacer(Modifier.height(8.dp))
-
         Text(
-            text = "Fresh groceries",
+            "Fresh groceries",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Ink,
@@ -430,10 +384,7 @@ fun ProductScreen(
         )
 
         if (products.isEmpty()) {
-            Text(
-                text = "No products found.",
-                modifier = Modifier.padding(16.dp)
-            )
+            Text("No products found.", modifier = Modifier.padding(16.dp))
         } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -462,9 +413,7 @@ fun ProductCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -484,77 +433,38 @@ fun ProductCard(
 
             Spacer(Modifier.width(12.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(Modifier.weight(1f)) {
                 Text(
-                    text = product.name,
+                    product.name,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     color = Ink
                 )
-
+                Text(product.unit, color = Color.Gray, fontSize = 12.sp)
                 Text(
-                    text = product.unit,
-                    color = Color.Gray,
-                    fontSize = 12.sp
-                )
-
-                Spacer(Modifier.height(4.dp))
-
-                Text(
-                    text = "₹${product.price}",
+                    "₹${product.price}",
                     fontSize = 18.sp,
                     color = Green,
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(Modifier.height(6.dp))
-
                 if (quantity == 0) {
                     Button(
                         onClick = onAdd,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Green
-                        ),
-                        contentPadding = PaddingValues(
-                            horizontal = 18.dp,
-                            vertical = 6.dp
-                        )
+                        colors = ButtonDefaults.buttonColors(containerColor = Green),
+                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 6.dp)
                     ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = "Add"
-                        )
+                        Icon(Icons.Default.Add, contentDescription = "Add")
                         Text("Add")
                     }
                 } else {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = onRemove,
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Remove,
-                                contentDescription = "Remove one"
-                            )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
+                            Icon(Icons.Default.Remove, contentDescription = "Remove one")
                         }
-
-                        Text(
-                            text = "$quantity",
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        IconButton(
-                            onClick = onAdd,
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = "Add one"
-                            )
+                        Text("$quantity", fontWeight = FontWeight.Bold)
+                        IconButton(onClick = onAdd, modifier = Modifier.size(36.dp)) {
+                            Icon(Icons.Default.Add, contentDescription = "Add one")
                         }
                     }
                 }
@@ -580,13 +490,49 @@ fun CartScreen(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Back"
-                )
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
-
             Text(
-                text = "Your Cart",
+                "Your Cart",
                 fontSize = 23.sp,
-                fontWeight = FontWeigh
+                fontWeight = FontWeight.Bold,
+                color = Ink
+            )
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        if (cartItems.isEmpty()) {
+            Text("Your cart is empty.", modifier = Modifier.padding(16.dp))
+        } else {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(cartItems, key = { it.id }) { item ->
+                    Card(colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(Modifier.weight(1f)) {
+                                Text(item.name, fontWeight = FontWeight.Bold, color = Ink)
+                                Text(
+                                    "₹${item.price} × ${cart.getOrDefault(item.id, 0)}",
+                                    color = Color.Gray
+                                )
+                                Text(
+                                    "Subtotal: ₹${item.price * cart.getOrDefault(item.id, 0)}",
+                                    color = Green,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            IconButton(onClick = {
+                                onQuantityChange(
+                                    item.id,
+                                    cart.getOrDefault(item.id, 0) - 1
+                                )
+                         
