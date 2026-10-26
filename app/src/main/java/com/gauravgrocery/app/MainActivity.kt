@@ -663,7 +663,7 @@ fontWeight = FontWeight.Bold
 fun CheckoutScreen(
     totalPrice: Int,
     onBack: () -> Unit,
-    onPlaceOrder: () -> Unit,
+    onPlaceOrder: (String, String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var customerName by remember { mutableStateOf("") }
