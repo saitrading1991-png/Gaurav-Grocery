@@ -1,5 +1,8 @@
 package com.gauravgrocery.app
 
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
