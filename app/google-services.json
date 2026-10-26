@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "517960988134",
+    "project_id": "gaurav-grocery",
+    "storage_bucket": "gaurav-grocery.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517960988134:android:cfac5d731a6f6eb77bd227",
+        "android_client_info": {
+          "package_name": "com.gauravgrocery.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaAuAKbIkAj0t1ojQwCfDUs6e48ZNR5h8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
