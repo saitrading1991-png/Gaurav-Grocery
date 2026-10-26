@@ -544,4 +544,129 @@ fun CartScreen(
                 Text(
                     text = "₹$totalPrice",
                     fontSize = 22.sp,
-                    fontWeight = FontW
+                    
+fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Button(
+                onClick = onCheckout,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Green
+                )
+            ) {
+                Text("Proceed to Checkout")
+            }
+        }
+    }
+}
+
+@Composable
+fun CheckoutScreen(
+    totalPrice: Int,
+    onBack: () -> Unit,
+    onPlaceOrder: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var customerName by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+
+            Text(
+                text = "Checkout",
+                fontSize = 23.sp,
+                fontWeight = FontWeight.Bold,
+                color = Ink
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = "Order Total: ₹$totalPrice",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Green
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = customerName,
+            onValueChange = { customerName = it },
+            label = { Text("Full Name") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Phone Number") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = address,
+            onValueChange = { address = it },
+            label = { Text("Delivery Address") },
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 3
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Button(
+            onClick = {
+                if (
+                    customerName.isNotBlank() &&
+                    phone.length == 10 &&
+                    phone.all { it.isDigit() } &&
+                    address.isNotBlank()
+                ) {
+                    onPlaceOrder()
+                }
+            },
+            enabled = customerName.isNotBlank() &&
+                phone.length == 10 &&
+                phone.all { it.isDigit() } &&
+                address.isNotBlank(),
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Green
+            )
+        ) {
+            Text("Place Demo Order")
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = "Demo checkout only. No real payment is processed.",
+            color = Color.Gray,
+            fontSize = 12.sp
+        )
+    }
+}
+
