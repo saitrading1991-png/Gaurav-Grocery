@@ -1,20 +1,12 @@
-
 package com.gauravgrocery.app
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,27 +14,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.firebase.Firebase
@@ -66,12 +42,9 @@ data class CartItem(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             MaterialTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    GroceryApp()
-                }
+                GroceryApp()
             }
         }
     }
@@ -80,7 +53,7 @@ class MainActivity : ComponentActivity() {
 private val groceryProducts = listOf(
     GroceryProduct(1, "Fresh Apples", "Fruits", 120.0, "1 kg", "🍎"),
     GroceryProduct(2, "Bananas", "Fruits", 50.0, "1 dozen", "🍌"),
-    GroceryProduct(3, "Fresh Oranges", "Fruits", 90.0, "1 kg", "🍊"),
+    GroceryProduct(3, "Oranges", "Fruits", 90.0, "1 kg", "🍊"),
     GroceryProduct(4, "Potatoes", "Vegetables", 35.0, "1 kg", "🥔"),
     GroceryProduct(5, "Tomatoes", "Vegetables", 40.0, "1 kg", "🍅"),
     GroceryProduct(6, "Onions", "Vegetables", 45.0, "1 kg", "🧅"),
@@ -95,6 +68,7 @@ private val groceryProducts = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroceryApp() {
+    val context = LocalContext.current
     val cart = remember { mutableStateListOf<CartItem>() }
 
     var searchText by remember { mutableStateOf("") }
@@ -108,15 +82,9 @@ fun GroceryApp() {
     )
 
     val filteredProducts = groceryProducts.filter { product ->
-        val matchesSearch = product.name.contains(
-            searchText,
-            ignoreCase = true
-        )
-        val matchesCategory =
-            selectedCategory == "All" ||
-                product.category == selectedCategory
-
-        matchesSearch && matchesCategory
+        product.name.contains(searchText, ignoreCase = true) &&
+            (selectedCategory == "All" ||
+                product.category == selectedCategory)
     }
 
     val totalItems = cart.sumOf { it.quantity }
@@ -130,27 +98,25 @@ fun GroceryApp() {
                 title = {
                     Column {
                         Text(
-                            text = "Gaurav Grocery",
+                            "Gaurav Grocery",
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Fresh groceries at your doorstep",
+                            "Fresh groceries at your doorstep",
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                 },
                 actions = {
-                    OutlinedButton(
+                    TextButton(
                         onClick = {
                             showCart = true
                             showCheckout = false
-                        },
-                        modifier = Modifier.padding(end = 8.dp)
+                        }
                     ) {
-                        androidx.compose.material3.Icon(
-                            imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Cart",
-                            modifier = Modifier.size(18.dp)
+                        Icon(
+                            Icons.Default.ShoppingCart,
+                            contentDescription = "Cart"
                         )
                         Text(" $totalItems")
                     }
@@ -158,7 +124,6 @@ fun GroceryApp() {
             )
         }
     ) { innerPadding ->
-
         when {
             showCheckout -> {
                 CheckoutScreen(
@@ -175,11 +140,15 @@ fun GroceryApp() {
                                 cart.clear()
                                 showCheckout = false
                                 showCart = false
+                                Toast.makeText(
+                                    context,
+                                    "Order placed successfully!",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             },
                             onError = { message ->
                                 Toast.makeText(
-                                    android.app.ApplicationProviderPlaceholder
-                                        .application,
+                                    context,
                                     message,
                                     Toast.LENGTH_LONG
                                 ).show()
@@ -237,12 +206,7 @@ fun GroceryApp() {
                                 quantity = cart[index].quantity + 1
                             )
                         } else {
-                            cart.add(
-                                CartItem(
-                                    product = product,
-                                    quantity = 1
-                                )
-                            )
+                            cart.add(CartItem(product, 1))
                         }
                     }
                 )
@@ -267,7 +231,7 @@ fun ProductScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
             value = searchText,
@@ -277,9 +241,9 @@ fun ProductScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
 
-        androidx.compose.foundation.lazy.LazyRow(
+        LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(categories) { category ->
@@ -291,12 +255,11 @@ fun ProductScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         Text(
-            text = "Fresh groceries",
+            "Fresh groceries",
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 8.dp)
         )
 
         LazyColumn(
@@ -311,12 +274,7 @@ fun ProductScreen(
             }
 
             if (products.isEmpty()) {
-                item {
-                    Text(
-                        text = "No products found.",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+                item { Text("No products found.") }
             }
         }
     }
@@ -327,12 +285,7 @@ fun ProductCard(
     product: GroceryProduct,
     onAdd: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
-    ) {
+    Card(Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -340,7 +293,7 @@ fun ProductCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = product.emoji,
+                product.emoji,
                 style = MaterialTheme.typography.headlineLarge
             )
 
@@ -349,16 +302,13 @@ fun ProductCard(
                     .weight(1f)
                     .padding(horizontal = 12.dp)
             ) {
+                Text(product.name, fontWeight = FontWeight.Bold)
                 Text(
-                    text = product.name,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = product.unit,
+                    product.unit,
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "₹${product.price.toInt()}",
+                    "₹${product.price.toInt()}",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -385,12 +335,12 @@ fun CartScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "Your Cart",
+            "Your Cart",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
         if (cart.isEmpty()) {
             Text("Your cart is empty.")
@@ -400,58 +350,50 @@ fun CartScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(cart, key = { it.product.id }) { item ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    Card(Modifier.fillMaxWidth()) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
+                                .padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = item.product.emoji,
-                                style = MaterialTheme.typography.headlineMedium
-                            )
+                            Text(item.product.emoji)
 
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(horizontal = 10.dp)
+                                    .padding(horizontal = 8.dp)
                             ) {
                                 Text(
-                                    text = item.product.name,
+                                    item.product.name,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "₹${(item.product.price * item.quantity).toInt()}"
+                                    "₹${(item.product.price * item.quantity).toInt()}"
                                 )
                             }
 
-                            OutlinedButton(
+                            IconButton(
                                 onClick = {
                                     onQuantityChange(item.product, -1)
                                 }
                             ) {
-                                androidx.compose.material3.Icon(
+                                Icon(
                                     Icons.Default.Remove,
-                                    contentDescription = "Decrease quantity"
+                                    contentDescription = "Decrease"
                                 )
                             }
 
-                            Text(
-                                text = "${item.quantity}",
-                                modifier = Modifier.padding(horizontal = 8.dp)
-                            )
+                            Text("${item.quantity}")
 
-                            OutlinedButton(
+                            IconButton(
                                 onClick = {
                                     onQuantityChange(item.product, 1)
                                 }
                             ) {
-                                androidx.compose.material3.Icon(
+                                Icon(
                                     Icons.Default.Add,
-                                    contentDescription = "Increase quantity"
+                                    contentDescription = "Increase"
                                 )
                             }
                         }
@@ -462,7 +404,7 @@ fun CartScreen(
             HorizontalDivider()
 
             Text(
-                text = "Total: ₹${totalPrice.toInt()}",
+                "Total: ₹${totalPrice.toInt()}",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 12.dp)
@@ -504,16 +446,15 @@ fun CheckoutScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "Checkout",
+            "Checkout",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
+        Spacer(Modifier.height(12.dp))
         Text("Order total: ₹${totalPrice.toInt()}")
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
         OutlinedTextField(
             value = customerName,
@@ -523,7 +464,7 @@ fun CheckoutScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
             value = phone,
@@ -533,29 +474,25 @@ fun CheckoutScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
             value = address,
             onValueChange = { address = it },
             label = { Text("Delivery address") },
-            modifier = Modifier.fillMaxWidth(),
-            minLines = 3
+            minLines = 3,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
         Button(
             onClick = {
                 if (
                     customerName.isBlank() ||
-                    phone.isBlank() ||
-                    address.isBlank()
+                    address.isBlank() ||
+                    phone.filter { it.isDigit() }.length < 10
                 ) {
-                    return@Button
-                }
-
-                if (phone.filter { it.isDigit() }.length < 10) {
                     return@Button
                 }
 
@@ -593,6 +530,11 @@ private fun saveGroceryOrder(
     val auth = Firebase.auth
     val db = Firebase.firestore
 
+    if (cart.isEmpty()) {
+        onError("Your cart is empty.")
+        return
+    }
+
     val orderItems = cart.map { item ->
         mapOf(
             "productId" to item.product.id,
@@ -612,7 +554,31 @@ private fun saveGroceryOrder(
         "createdAt" to System.currentTimeMillis()
     )
 
-    fun saveWithSignedInUser() {
+    fun writeOrder() {
         db.collection("orders")
             .add(order)
-  
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener { exception ->
+                onError(
+                    exception.localizedMessage ?: "Could not save order"
+                )
+            }
+    }
+
+    if (auth.currentUser != null) {
+        writeOrder()
+    } else {
+        auth.signInAnonymously()
+            .addOnSuccessListener {
+                writeOrder()
+            }
+            .addOnFailureListener { exception ->
+                onError(
+                    exception.localizedMessage ?: "Authentication failed"
+                )
+            }
+    }
+}
+
