@@ -1,0 +1,44 @@
+
+name: Extract Android Project Files
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract project files
+        run: |
+          mkdir extracted
+          unzip -q GauravGrocery_Android_Project_Mobile_Build.zip -d extracted
+
+          APP_GRADLE=$(find extracted -type f -path '*/app/build.gradle.kts' -print -quit)
+
+          if [ -z "$APP_GRADLE" ]; then
+            echo "Android project files not found in ZIP"
+            exit 1
+          fi
+
+          PROJECT_DIR="${APP_GRADLE%/app/build.gradle.kts}"
+
+          find "$PROJECT_DIR" -mindepth 1 -maxdepth 1 ! -name .github -exec cp -R {} . \;
+
+      - name: Save source files to GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Extract Android project source files"
+            git push
+          else
+            echo "No new files to save"
+          fi
+          
