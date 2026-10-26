@@ -37,7 +37,99 @@ private val Green = Color(0xFF247A42)
 private val PaleGreen = Color(0xFFF0F7EE)
 private val Ink = Color(0xFF193B27)
 private val PageBackground = Color(0xFFF8FAF6)
+private val auth: FirebaseAuth by lazy {
+    FirebaseAuth.getInstance()
+}
 
+private val db: FirebaseFirestore by lazy {
+    FirebaseFirestore.getInstance()
+}
+
+private fun saveGroceryOrder(
+    customerName: String,
+    phone: String,
+    address: String,
+    items: List<Map<String, Any>>,
+    totalPrice: Long,
+    onResult: (Boolean, String) -> Unit
+) {
+    // पहले Anonymous sign-in करें
+    val currentUser = auth.currentUser
+
+    if (currentUser != null) {
+        submitOrder(
+            currentUser.uid,
+            customerName,
+            phone,
+            address,
+            items,
+            totalPrice,
+            onResult
+        )
+    } else {
+        auth.signInAnonymously()
+            .addOnSuccessListener { result ->
+                val uid = result.user?.uid
+
+                if (uid == null) {
+                    onResult(false, "User ID नहीं मिला")
+                    return@addOnSuccessListener
+                }
+
+                submitOrder(
+                    uid,
+                    customerName,
+                    phone,
+                    address,
+                    items,
+                    totalPrice,
+                    onResult
+                )
+            }
+            .addOnFailureListener { error ->
+                onResult(
+                    false,
+                    error.localizedMessage ?: "Sign-in असफल हुआ"
+                )
+            }
+    }
+}
+
+private fun submitOrder(
+    uid: String,
+    customerName: String,
+    phone: String,
+    address: String,
+    items: List<Map<String, Any>>,
+    totalPrice: Long,
+    onResult: (Boolean, String) -> Unit
+) {
+    val order = hashMapOf<String, Any>(
+        "ownerUid" to uid,
+        "customerName" to customerName.trim(),
+        "phone" to phone.trim(),
+        "address" to address.trim(),
+        "items" to items,
+        "totalPrice" to totalPrice,
+        "status" to "Pending",
+        "createdAt" to FieldValue.serverTimestamp()
+    )
+
+    db.collection("orders")
+        .add(order)
+        .addOnSuccessListener { document ->
+            onResult(
+                true,
+                "ऑर्डर सफलतापूर्वक सेव हुआ: ${document.id}"
+            )
+        }
+        .addOnFailureListener { error ->
+            onResult(
+                false,
+                error.localizedMessage ?: "ऑर्डर सेव नहीं हुआ"
+            )
+        }
+}
 data class Grocery(
     val id: Int,
     val name: String,
