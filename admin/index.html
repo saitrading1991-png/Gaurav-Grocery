@@ -6,26 +6,51 @@
   <title>Gaurav Grocery Admin</title>
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; background: #f2f6f3; color: #203128; }
-    header { background: #146c43; color: white; padding: 18px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    body {
+      margin: 0; font-family: Arial, sans-serif;
+      background: #f2f6f3; color: #203128;
+    }
+    header {
+      background: #146c43; color: white; padding: 18px;
+      display: flex; justify-content: space-between;
+      align-items: center; gap: 10px; flex-wrap: wrap;
+    }
     h1 { font-size: 22px; margin: 0; }
     main { width: min(1050px, 94%); margin: 24px auto; }
-    .panel, .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 18px; box-shadow: 0 2px 10px #0000000b; }
+    .panel, .card {
+      background: white; border-radius: 12px; padding: 18px;
+      margin-bottom: 18px; box-shadow: 0 2px 10px #0000000b;
+      min-width: 0;
+    }
     label { display: block; font-weight: bold; margin: 12px 0 6px; }
-    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccd6cf; border-radius: 7px; font-size: 15px; }
-    button { padding: 11px 15px; border: 0; border-radius: 7px; background: #146c43; color: white; font-weight: bold; cursor: pointer; margin: 5px 5px 5px 0; }
-    button:disabled { opacity: .55; }
+    input, select, textarea {
+      width: 100%; padding: 12px; border: 1px solid #ccd6cf;
+      border-radius: 7px; font-size: 15px;
+    }
+    button {
+      padding: 11px 15px; border: 0; border-radius: 7px;
+      background: #146c43; color: white; font-weight: bold;
+      cursor: pointer; margin: 5px 5px 5px 0;
+    }
+    button:disabled { opacity: .55; cursor: not-allowed; }
     .secondary { background: #52645a; }
     .danger { background: #b42318; }
     .warning { background: #9a6500; }
     .hidden { display: none !important; }
     .tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
     .muted { color: #637267; font-size: 14px; }
     .message { overflow-wrap: anywhere; font-weight: bold; }
     .error { color: #b42318; }
     .success { color: #146c43; }
     .price { color: #146c43; font-size: 20px; font-weight: bold; }
+    .product-image {
+      width: 100%; height: 140px; object-fit: contain;
+    }
   </style>
 </head>
 <body>
@@ -40,15 +65,14 @@
     <p class="muted">Firebase Authentication se login karein.</p>
     <form id="loginForm">
       <label for="email">Admin Email</label>
-      <input id="email" type="email" value="sai.trading1991@gmail.com" required autocomplete="username">
+      <input id="email" type="email"
+        value="sai.trading1991@gmail.com" required autocomplete="username">
 
       <label for="password">Password</label>
-      <input id="password" type="password" required autocomplete="current-password">
+      <input id="password" type="password" required
+        autocomplete="current-password">
 
-      <button id="loginBtn" type="submit"
-        onclick="document.getElementById('loginMessage').textContent='Login button working; checking Firebase…'">
-        Login
-      </button>
+      <button id="loginBtn" type="submit">Login</button>
     </form>
     <p id="loginMessage" class="message" role="status">Loading login system…</p>
   </section>
@@ -78,24 +102,39 @@
           <input id="productCategory" required maxlength="60">
 
           <label for="productUnit">Unit *</label>
-          <input id="productUnit" required maxlength="40" placeholder="1 kg, 500 g, 1 litre">
+          <input id="productUnit" required maxlength="40"
+            placeholder="1 kg, 500 g, 1 litre">
 
           <label for="productPrice">Price (₹) *</label>
-          <input id="productPrice" type="number" min="0.01" step="0.01" required>
+          <input id="productPrice" type="number"
+            min="0.01" step="0.01" required>
+
+          <label for="productQuantity">Available Quantity *</label>
+          <input id="productQuantity" type="number"
+            min="0" step="1" value="0" required>
+          <p class="muted">
+            Example: Unit 1 kg hai to quantity 10 ka matlab 10 packets.
+          </p>
 
           <label for="productEmoji">Emoji</label>
           <input id="productEmoji" value="🛒" maxlength="20">
 
           <label for="productImage">Image URL (optional)</label>
-          <input id="productImage" type="url" placeholder="https://example.com/image.jpg">
+          <input id="productImage" type="url"
+            placeholder="https://example.com/image.jpg">
 
           <label for="productDescription">Description</label>
           <textarea id="productDescription" maxlength="500"></textarea>
 
-          <label><input id="productStock" type="checkbox" checked style="width:auto"> In Stock</label>
+          <label>
+            <input id="productActive" type="checkbox" checked
+              style="width:auto">
+            Visible in app
+          </label>
 
           <button id="saveProductBtn" type="submit">Add Product</button>
-          <button id="cancelEditBtn" class="secondary hidden" type="button">Cancel Edit</button>
+          <button id="cancelEditBtn" class="secondary hidden"
+            type="button">Cancel Edit</button>
         </form>
         <p id="productMessage" class="message" role="status"></p>
       </div>
@@ -110,18 +149,17 @@
 </main>
 
 <script>
-  // Ye message Firebase module load hone se pehle bhi kaam karega.
   window.addEventListener("error", function(e) {
     const el = document.getElementById("loginMessage");
     if (el) {
-      el.textContent = "JavaScript load error: " + (e.message || "Script failed");
+      el.textContent = "JavaScript error: " + (e.message || "Script failed");
       el.className = "message error";
     }
   });
   window.addEventListener("unhandledrejection", function(e) {
     const el = document.getElementById("loginMessage");
     if (el) {
-      el.textContent = "Firebase error: " +
+      el.textContent = "Error: " +
         (e.reason?.message || String(e.reason));
       el.className = "message error";
     }
@@ -136,14 +174,17 @@
     const { initializeApp } = await import(
       "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js"
     );
+
     const {
-      getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+      getAuth, signInWithEmailAndPassword,
+      onAuthStateChanged, signOut
     } = await import(
       "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js"
     );
+
     const {
-      getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
-      doc, query, orderBy
+      getFirestore, collection, getDocs, addDoc, updateDoc,
+      deleteDoc, doc, query, orderBy, runTransaction
     } = await import(
       "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js"
     );
@@ -193,7 +234,10 @@
     }
 
     function adminCheck() {
-      if (!currentUser || currentUser.email?.toLowerCase() !== ADMIN_EMAIL) {
+      if (
+        !currentUser ||
+        currentUser.email?.toLowerCase() !== ADMIN_EMAIL
+      ) {
         throw new Error("Admin account se login karein.");
       }
     }
@@ -209,7 +253,7 @@
         const password = $("password").value;
 
         if (email !== ADMIN_EMAIL) {
-          throw new Error("Admin email sahi enter karein: " + ADMIN_EMAIL);
+          throw new Error("Admin email sahi enter karein.");
         }
 
         await signInWithEmailAndPassword(auth, email, password);
@@ -221,14 +265,18 @@
           "auth/invalid-email": "Email address sahi nahi hai.",
           "auth/user-not-found": "Firebase Authentication mein user nahi mila.",
           "auth/wrong-password": "Password galat hai.",
-          "auth/too-many-requests": "Bahut attempts hue. Thodi der baad try karein.",
+          "auth/too-many-requests": "Bahut attempts hue. Baad mein try karein.",
           "auth/network-request-failed": "Internet connection check karein.",
-          "auth/operation-not-allowed": "Firebase mein Email/Password sign-in enable karein.",
-          "auth/unauthorized-domain": "Firebase Authentication ke Authorized domains mein sait rading1991-png.github.io add karein."
+          "auth/operation-not-allowed": "Email/Password sign-in enable karein.",
+          "auth/unauthorized-domain": "Firebase Authentication ke Authorized domains check karein."
         };
-        message("loginMessage",
+
+        message(
+          "loginMessage",
           errors[err.code] || (err.code ? err.code + ": " : "") +
-          (err.message || "Login failed."), true);
+            (err.message || "Login failed."),
+          true
+        );
       } finally {
         btn.disabled = false;
       }
@@ -248,29 +296,160 @@
       loadProducts();
     });
 
+    // Stock aur order status ek transaction mein update hote hain.
+    async function confirmOrderAndDeductStock(orderId) {
+      adminCheck();
+
+      await runTransaction(db, async transaction => {
+        const orderRef = doc(db, "orders", orderId);
+        const orderSnap = await transaction.get(orderRef);
+
+        if (!orderSnap.exists()) {
+          throw new Error("Order nahi mila.");
+        }
+
+        const order = orderSnap.data();
+
+        if (order.status !== "Pending") {
+          throw new Error(
+            "Order Pending nahi hai. Stock dobara nahi ghatega."
+          );
+        }
+
+        if (!Array.isArray(order.items) || order.items.length === 0) {
+          throw new Error("Order items valid nahi hain.");
+        }
+
+        // Duplicate product lines ko ek quantity mein combine karein.
+        const quantities = new Map();
+
+        for (const item of order.items) {
+          const productId = item.productId;
+          const qty = Number(item.quantity);
+
+          if (
+            typeof productId !== "string" ||
+            !productId ||
+            !Number.isSafeInteger(qty) ||
+            qty <= 0
+          ) {
+            throw new Error("Order mein product ya quantity invalid hai.");
+          }
+
+          const combined = (quantities.get(productId) || 0) + qty;
+
+          if (!Number.isSafeInteger(combined)) {
+            throw new Error("Product quantity bahut badi hai.");
+          }
+
+          quantities.set(productId, combined);
+        }
+
+        const productIds = [...quantities.keys()];
+        const productRefs = productIds.map(
+          id => doc(db, "products", id)
+        );
+
+        // Firestore transaction mein pehle saare reads.
+        const productSnaps = [];
+
+        for (const ref of productRefs) {
+          productSnaps.push(await transaction.get(ref));
+        }
+
+        const updates = [];
+
+        for (let i = 0; i < productRefs.length; i++) {
+          const snap = productSnaps[i];
+          const required = quantities.get(productIds[i]);
+
+          if (!snap.exists()) {
+            throw new Error("Order ka ek product delete ho chuka hai.");
+          }
+
+          const product = snap.data();
+          const stock = product.stockQuantity;
+
+          // Purane products mein stockQuantity nahi hai to
+          // Admin ko pehle quantity set karni hogi.
+          if (
+            !Number.isSafeInteger(stock) ||
+            stock < 0
+          ) {
+            throw new Error(
+              `${product.name || "Product"} ka valid stockQuantity set karein.`
+            );
+          }
+
+          if (product.active === false) {
+            throw new Error(
+              `${product.name || "Product"} ab available nahi hai.`
+            );
+          }
+
+          if (stock < required) {
+            throw new Error(
+              `Stock kam hai: ${product.name || "Product"}. ` +
+              `Available: ${stock}, required: ${required}.`
+            );
+          }
+
+          updates.push({
+            ref: productRefs[i],
+            newStock: stock - required
+          });
+        }
+
+        // Saare reads complete hone ke baad writes.
+        for (const item of updates) {
+          transaction.update(item.ref, {
+            stockQuantity: item.newStock,
+            inStock: item.newStock > 0,
+            updatedAt: Date.now()
+          });
+        }
+
+        transaction.update(orderRef, {
+          status: "Confirmed"
+        });
+      });
+    }
+
     async function loadOrders() {
       try {
         adminCheck();
         message("ordersMessage", "Orders load ho rahe hain…");
 
         let snap;
+
         try {
-          snap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc")));
+          snap = await getDocs(
+            query(collection(db, "orders"), orderBy("createdAt", "desc"))
+          );
         } catch (err) {
           if (err.code === "permission-denied") throw err;
           snap = await getDocs(collection(db, "orders"));
         }
 
-        const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        orders.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+        const orders = snap.docs.map(d => ({
+          id: d.id, ...d.data()
+        }));
+
+        orders.sort((a, b) =>
+          Number(b.createdAt || 0) - Number(a.createdAt || 0)
+        );
 
         const list = $("ordersList");
         list.replaceChildren();
 
-        if (!orders.length) list.innerHTML = "<p>No orders yet.</p>";
+        if (!orders.length) {
+          list.innerHTML = "<p>No orders yet.</p>";
+        }
 
-        const statuses = ["Pending", "Confirmed", "Processing",
-          "Out for Delivery", "Delivered", "Cancelled"];
+        const statuses = [
+          "Pending", "Confirmed", "Preparing",
+          "Out for Delivery", "Delivered", "Cancelled"
+        ];
 
         orders.forEach(o => {
           const card = document.createElement("div");
@@ -283,31 +462,69 @@
             <p><b>Phone:</b> ${esc(o.phone || "N/A")}</p>
             <p><b>Address:</b> ${esc(o.address || "N/A")}</p>
             <p><b>Date:</b> ${esc(dateText(o.createdAt))}</p>
-            <ul>${items.map(i => `<li>${esc(i.name || i.productId || "Product")}
-              × ${esc(i.quantity ?? 1)}</li>`).join("")}</ul>
+            <ul>${items.map(i =>
+              `<li>${esc(i.name || i.productId || "Product")}
+              × ${esc(i.quantity ?? 1)}</li>`
+            ).join("")}</ul>
             <p class="price">Total: ${money(o.totalPrice)}</p>
-            <label>Status</label>
+            <p><b>Status:</b> ${esc(o.status || "Pending")}</p>
+            <label>Change Status</label>
             <select class="status">
-              ${statuses.map(s => `<option ${s === (o.status || "Pending") ? "selected" : ""}>${s}</option>`).join("")}
-              ${statuses.includes(o.status) || !o.status ? "" : `<option selected>${esc(o.status)}</option>`}
+              ${statuses.map(s =>
+                `<option ${s === (o.status || "Pending") ? "selected" : ""}>${s}</option>`
+              ).join("")}
+              ${statuses.includes(o.status) || !o.status ? "" :
+                `<option selected>${esc(o.status)}</option>`}
             </select>
             <button class="save">Save Status</button>
           `;
 
           card.querySelector(".save").addEventListener("click", async e => {
-            e.currentTarget.disabled = true;
+            const button = e.currentTarget;
+            const selectedStatus = card.querySelector(".status").value;
+            button.disabled = true;
+
             try {
               adminCheck();
-              await updateDoc(doc(db, "orders", o.id), {
-                status: card.querySelector(".status").value
-              });
-              message("ordersMessage", "Order status updated.");
+
+              if (
+                o.status === "Pending" &&
+                selectedStatus === "Confirmed"
+              ) {
+                await confirmOrderAndDeductStock(o.id);
+                message(
+                  "ordersMessage",
+                  "Order confirmed. Stock successfully updated."
+                );
+              } else {
+                if (
+                  o.status === "Confirmed" &&
+                  selectedStatus === "Pending"
+                ) {
+                  throw new Error(
+                    "Confirmed order ko Pending par wapas nahi kar sakte."
+                  );
+                }
+
+                await updateDoc(doc(db, "orders", o.id), {
+                  status: selectedStatus
+                });
+
+                message("ordersMessage", "Order status updated.");
+              }
+
               await loadOrders();
+              await loadProducts();
             } catch (err) {
-              message("ordersMessage", err.message, true);
-              e.currentTarget.disabled = false;
+              message(
+                "ordersMessage",
+                "Order update failed: " + err.message,
+                true
+              );
+              button.disabled = false;
             }
           });
+
           list.appendChild(card);
         });
 
@@ -321,7 +538,8 @@
       $("productForm").reset();
       $("productId").value = "";
       $("productEmoji").value = "🛒";
-      $("productStock").checked = true;
+      $("productQuantity").value = "0";
+      $("productActive").checked = true;
       $("formTitle").textContent = "Add Product";
       $("saveProductBtn").textContent = "Add Product";
       $("cancelEditBtn").classList.add("hidden");
@@ -332,164 +550,68 @@
     async function loadProducts() {
       try {
         adminCheck();
-        const snap = await getDocs(collection(db, "products"));
-        productsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        productsCache.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
 
-        $("productCount").textContent = "Total products: " + productsCache.length;
+        const snap = await getDocs(collection(db, "products"));
+
+        productsCache = snap.docs.map(d => ({
+          id: d.id, ...d.data()
+        }));
+
+        productsCache.sort((a, b) =>
+          String(a.name || "").localeCompare(String(b.name || ""))
+        );
+
+        $("productCount").textContent =
+          "Total products: " + productsCache.length;
+
         const list = $("productList");
         list.replaceChildren();
 
-        if (!productsCache.length) list.innerHTML = "<p>No products yet. Add your first product above.</p>";
+        if (!productsCache.length) {
+          list.innerHTML =
+            "<p>No products yet. Add your first product above.</p>";
+        }
 
         productsCache.forEach(p => {
           const card = document.createElement("div");
           card.className = "card";
-          const inStock = p.inStock !== false;
+
+          const stock = Number.isSafeInteger(p.stockQuantity)
+            && p.stockQuantity >= 0 ? p.stockQuantity : null;
+
+          const inStock = stock !== null
+            ? stock > 0
+            : p.inStock !== false;
+
           const active = p.active !== false;
           let image = "";
+
           try {
             const u = new URL(p.imageUrl || "");
-            if (["https:", "http:"].includes(u.protocol)) image = u.href;
+            if (["https:", "http:"].includes(u.protocol)) {
+              image = u.href;
+            }
           } catch (_) {}
 
           card.innerHTML = `
-            ${image ? `<img src="${esc(image)}" alt="" style="width:100%;height:140px;object-fit:contain">` : `<div style="font-size:42px">${esc(p.emoji || "🛒")}</div>`}
+            ${image
+              ? `<img class="product-image" src="${esc(image)}" alt="">`
+              : `<div style="font-size:42px">${esc(p.emoji || "🛒")}</div>`}
             <h3>${esc(p.name || "Unnamed Product")}</h3>
             <p>${esc(p.category || "")} · ${esc(p.unit || "")}</p>
             <p class="price">${money(p.price)}</p>
+            <p>Quantity: ${stock === null ? "Not set" : stock}</p>
             <p>Stock: ${inStock ? "In Stock" : "Out of Stock"}</p>
             <p>Visibility: ${active ? "Active" : "Hidden"}</p>
             <p>${esc(p.description || "")}</p>
             <button class="edit">Edit</button>
-            <button class="stock warning">${inStock ? "Out of Stock" : "In Stock"}</button>
-            <button class="visibility secondary">${active ? "Hide" : "Show"}</button>
+            <button class="stock warning">
+              ${inStock ? "Set Out of Stock" : "Set In Stock"}
+            </button>
+            <button class="visibility secondary">
+              ${active ? "Hide" : "Show"}
+            </button>
             <button class="delete danger">Delete</button>
           `;
 
-          card.querySelector(".edit").addEventListener("click", () => {
-            $("productId").value = p.id;
-            $("productName").value = p.name || "";
-            $("productCategory").value = p.category || "";
-            $("productUnit").value = p.unit || "";
-            $("productPrice").value = p.price ?? "";
-            $("productEmoji").value = p.emoji || "🛒";
-            $("productImage").value = p.imageUrl || "";
-            $("productDescription").value = p.description || "";
-            $("productStock").checked = inStock;
-            $("formTitle").textContent = "Edit Product";
-            $("saveProductBtn").textContent = "Save Changes";
-            $("cancelEditBtn").classList.remove("hidden");
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          });
-
-          card.querySelector(".stock").addEventListener("click", () =>
-            updateProduct(p.id, { inStock: !inStock, updatedAt: Date.now() }));
-
-          card.querySelector(".visibility").addEventListener("click", () =>
-            updateProduct(p.id, { active: !active, updatedAt: Date.now() }));
-
-          card.querySelector(".delete").addEventListener("click", async () => {
-            if (!confirm(`Delete "${p.name || "this product"}"?`)) return;
-            try {
-              adminCheck();
-              await deleteDoc(doc(db, "products", p.id));
-              message("productMessage", "Product deleted.");
-              await loadProducts();
-            } catch (err) {
-              message("productMessage", "Delete error: " + err.message, true);
-            }
-          });
-          list.appendChild(card);
-        });
-        message("productMessage", "Products loaded.");
-      } catch (err) {
-        message("productMessage", "Products error: " + err.message, true);
-      }
-    }
-
-    async function updateProduct(id, data) {
-      try {
-        adminCheck();
-        await updateDoc(doc(db, "products", id), data);
-        message("productMessage", "Product updated.");
-        await loadProducts();
-      } catch (err) {
-        message("productMessage", "Update error: " + err.message, true);
-      }
-    }
-
-    $("productForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const btn = $("saveProductBtn");
-      btn.disabled = true;
-      try {
-        adminCheck();
-        const price = Number($("productPrice").value);
-        if (!Number.isFinite(price) || price <= 0) throw new Error("Price zero se zyada hona chahiye.");
-
-        const imageUrl = $("productImage").value.trim();
-        if (imageUrl) {
-          const u = new URL(imageUrl);
-          if (!["https:", "http:"].includes(u.protocol)) throw new Error("Image URL sahi nahi hai.");
-        }
-
-        const data = {
-          name: $("productName").value.trim(),
-          category: $("productCategory").value.trim(),
-          unit: $("productUnit").value.trim(),
-          price,
-          emoji: $("productEmoji").value.trim() || "🛒",
-          imageUrl,
-          description: $("productDescription").value.trim(),
-          inStock: $("productStock").checked,
-          updatedAt: Date.now()
-        };
-
-        const id = $("productId").value;
-        if (id) {
-          const old = productsCache.find(p => p.id === id);
-          data.active = old?.active !== false;
-          await updateDoc(doc(db, "products", id), data);
-          message("productMessage", "Product updated successfully.");
-        } else {
-          data.active = true;
-          data.createdAt = Date.now();
-          await addDoc(collection(db, "products"), data);
-          message("productMessage", "Product added successfully.");
-        }
-        resetForm();
-        await loadProducts();
-      } catch (err) {
-        message("productMessage", "Save error: " + err.message, true);
-      } finally {
-        btn.disabled = false;
-      }
-    });
-
-    onAuthStateChanged(auth, async user => {
-      currentUser = user;
-      if (user && user.email?.toLowerCase() === ADMIN_EMAIL) {
-        $("loginPanel").classList.add("hidden");
-        $("adminPanel").classList.remove("hidden");
-        $("logoutBtn").classList.remove("hidden");
-        await loadOrders();
-        await loadProducts();
-      } else {
-        if (user) await signOut(auth);
-        $("loginPanel").classList.remove("hidden");
-        $("adminPanel").classList.add("hidden");
-        $("logoutBtn").classList.add("hidden");
-        if (user) message("loginMessage", "Is account ko admin access nahi hai.", true);
-        else message("loginMessage", "Login ke liye email aur password enter karein.");
-      }
-    });
-
-  } catch (err) {
-    loginMessage.textContent =
-      "Firebase JavaScript load nahi hui: " + (err.message || String(err));
-    loginMessage.className = "message error";
-  }
-</script>
-</body>
-</html>
+          card.querySelector
