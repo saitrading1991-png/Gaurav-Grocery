@@ -106,7 +106,7 @@
     };
 
     // STEP B: Use the same admin email in Firestore Rules.
-    const ADMIN_EMAIL = "your-admin-email@example.com";
+    const ADMIN_EMAIL = "sai.tradin1991@gmail.com";
 
     const STATUSES = [
       "Pending",
@@ -144,12 +144,11 @@
     }
 
     function isAuthorized(user) {
-      return Boolean(
-        user &&
-        user.email &&
-        user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
-        user.emailVerified
-      );
+  return Boolean(
+    user &&
+    user.email &&
+    user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+  );
     }
 
     loginForm.addEventListener("submit", async event => {
