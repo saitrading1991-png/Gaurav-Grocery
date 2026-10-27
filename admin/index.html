@@ -230,6 +230,27 @@
     </section>
   </main>
 
+<script>
+  window.addEventListener("error", function (event) {
+    var message = document.getElementById("loginMessage");
+    if (message) {
+      message.textContent =
+        "JavaScript error: " + (event.message || "Script load failed");
+      message.style.color = "red";
+    }
+  });
+
+  window.addEventListener("unhandledrejection", function (event) {
+    var message = document.getElementById("loginMessage");
+    if (message) {
+      message.textContent =
+        "Firebase error: " +
+        (event.reason?.message || String(event.reason));
+      message.style.color = "red";
+    }
+  });
+</script>
+  
   <script type="module">
     import { initializeApp } from
       "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
