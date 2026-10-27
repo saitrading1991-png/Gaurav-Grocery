@@ -1,10 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gaurav Grocery Admin</title>
-  <meta name="theme-color" content="#166534">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaurav Grocery | Admin Panel</title>
 
   <style>
     * { box-sizing: border-box; }
@@ -12,149 +12,222 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f3f7f3;
-      color: #17251a;
+      background: #f3f6f4;
+      color: #203128;
     }
 
     header {
-      background: #166534;
+      background: #146c43;
       color: white;
-      padding: 20px 16px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    header h1 {
-      margin: 0 0 6px;
-      font-size: 24px;
-    }
-
-    header p { margin: 0; }
+    header h1 { margin: 0; font-size: 22px; }
 
     main {
-      max-width: 1000px;
-      margin: auto;
-      padding: 16px;
+      width: min(1100px, 94%);
+      margin: 24px auto;
     }
 
-    .panel, .order {
+    .panel, .card {
       background: white;
+      padding: 20px;
+      margin-bottom: 20px;
       border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px #0000000d;
+      box-shadow: 0 3px 12px #0000000b;
     }
 
-    input, select, button {
+    h2 { margin-top: 0; }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
       width: 100%;
       padding: 12px;
-      margin: 6px 0;
-      border-radius: 8px;
-      border: 1px solid #cbd5cc;
-      font-size: 16px;
+      border: 1px solid #ccd6cf;
+      border-radius: 7px;
+      font-size: 15px;
+      background: white;
+    }
+
+    textarea {
+      min-height: 75px;
+      resize: vertical;
     }
 
     button {
-      background: #166534;
-      color: white;
       border: 0;
-      font-weight: bold;
+      border-radius: 7px;
+      padding: 11px 15px;
       cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      background: #146c43;
+      color: white;
+      margin: 5px 5px 5px 0;
     }
 
-    button.secondary { background: #475569; }
-    button:disabled { opacity: .55; cursor: wait; }
+    button:hover { opacity: .9; }
+    button:disabled { opacity: .5; cursor: wait; }
 
+    .secondary { background: #52645a; }
+    .danger { background: #c62828; }
+    .warning { background: #a76500; }
     .hidden { display: none !important; }
 
-    .muted {
-      color: #647067;
-      font-size: 14px;
-    }
-
-    .error {
-      color: #b91c1c;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .success {
-      color: #166534;
-      white-space: pre-wrap;
-    }
-
-    .order h3 {
-      margin-top: 0;
-      overflow-wrap: anywhere;
-    }
-
-    .details {
-      line-height: 1.7;
-      overflow-wrap: anywhere;
-    }
-
-    .status-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
+      margin-bottom: 20px;
     }
 
-    .status-row select, .status-row button {
-      min-width: 0;
+    .tabs button { margin: 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 15px;
     }
 
-    .item-list { padding-left: 20px; }
+    .card h3 { margin-top: 0; }
+    .muted { color: #66756b; font-size: 14px; }
+    .price { font-size: 20px; font-weight: bold; color: #146c43; }
+    .status { font-weight: bold; }
+    .message { margin-top: 12px; font-weight: bold; }
+    .success { color: #146c43; }
+    .error { color: #c62828; }
+    .empty { padding: 18px; color: #66756b; }
 
-    @media (max-width: 480px) {
-      .status-row { grid-template-columns: 1fr; }
+    @media (max-width: 500px) {
+      header h1 { font-size: 19px; }
+      .panel, .card { padding: 15px; }
     }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>🛒 Gaurav Grocery</h1>
-    <p>Secure Order Admin Panel</p>
+    <h1>🛒 Gaurav Grocery Admin</h1>
+    <button id="logoutBtn" class="secondary hidden">Logout</button>
   </header>
 
   <main>
+    <!-- LOGIN -->
     <section id="loginPanel" class="panel">
       <h2>Admin Login</h2>
-      <p class="muted">Sign in using your authorized admin account.</p>
+      <p class="muted">Sirf authorised admin account se login karein.</p>
 
       <form id="loginForm">
-        <label for="email">Admin email</label>
+        <label for="email">Admin Email</label>
         <input
           id="email"
           type="email"
-          autocomplete="username"
+          value="sai.trading1991@gmail.com"
           required
-          placeholder="admin@example.com"
+          autocomplete="username"
         >
 
         <label for="password">Password</label>
         <input
           id="password"
           type="password"
-          autocomplete="current-password"
           required
+          autocomplete="current-password"
         >
 
-        <button id="loginButton" type="submit">Login</button>
+        <button id="loginBtn" type="submit">Login</button>
       </form>
 
-      <p id="loginMessage" role="status" aria-live="polite"></p>
+      <p id="loginMessage" class="message" role="status"></p>
     </section>
 
-    <section id="ordersPanel" class="hidden">
-      <div class="panel">
-        <p id="signedInAs" class="muted"></p>
-        <button id="refreshButton" type="button">Refresh Orders</button>
-        <button id="logoutButton" class="secondary" type="button">
-          Logout
-        </button>
-        <p id="pageMessage" role="status" aria-live="polite"></p>
+    <!-- ADMIN APP -->
+    <section id="adminPanel" class="hidden">
+      <div class="tabs">
+        <button id="ordersTab">📦 Orders</button>
+        <button id="productsTab">🛍️ Products</button>
       </div>
 
-      <div id="ordersList"></div>
+      <!-- ORDERS -->
+      <section id="ordersPanel">
+        <div class="panel">
+          <h2>Customer Orders</h2>
+          <p id="ordersMessage" class="message" role="status"></p>
+          <div id="ordersList" class="grid">
+            <p class="empty">Orders load ho rahe hain...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section id="productsPanel" class="hidden">
+        <div class="panel">
+          <h2 id="productFormTitle">Add New Product</h2>
+
+          <form id="productForm">
+            <input id="productId" type="hidden">
+
+            <label for="productName">Product Name *</label>
+            <input id="productName" required maxlength="100"
+              placeholder="e.g. Aashirvaad Atta">
+
+            <label for="productCategory">Category *</label>
+            <input id="productCategory" required maxlength="60"
+              placeholder="e.g. Atta & Rice">
+
+            <label for="productUnit">Unit *</label>
+            <input id="productUnit" required maxlength="40"
+              placeholder="e.g. 5 kg, 1 litre, 500 g">
+
+            <label for="productPrice">Price (₹) *</label>
+            <input id="productPrice" type="number"
+              min="0.01" max="10000000" step="0.01" required>
+
+            <label for="productEmoji">Product Emoji</label>
+            <input id="productEmoji" value="🛒" maxlength="20">
+
+            <label for="productImage">Product Image URL (optional)</label>
+            <input id="productImage" type="url"
+              placeholder="https://example.com/product.jpg">
+
+            <label for="productDescription">Description (optional)</label>
+            <textarea id="productDescription" maxlength="500"
+              placeholder="Product details"></textarea>
+
+            <label>
+              <input id="productInStock" type="checkbox"
+                checked style="width:auto">
+              In Stock
+            </label>
+
+            <div style="margin-top:15px">
+              <button id="saveProductBtn" type="submit">Add Product</button>
+              <button id="cancelEditBtn" type="button"
+                class="secondary hidden">Cancel Edit</button>
+            </div>
+          </form>
+
+          <p id="productMessage" class="message" role="status"></p>
+        </div>
+
+        <div class="panel">
+          <h2>All Products</h2>
+          <p id="productCount" class="muted"></p>
+          <div id="productList" class="grid">
+            <p class="empty">Products load ho rahe hain...</p>
+          </div>
+        </div>
+      </section>
     </section>
   </main>
 
@@ -164,8 +237,8 @@
 
     import {
       getAuth,
-      onAuthStateChanged,
       signInWithEmailAndPassword,
+      onAuthStateChanged,
       signOut
     } from
       "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
@@ -174,24 +247,16 @@
       getFirestore,
       collection,
       getDocs,
-      query,
-      orderBy,
+      addDoc,
       doc,
-      updateDoc
+      updateDoc,
+      deleteDoc,
+      query,
+      orderBy
     } from
       "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-    import {
-  collection,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  doc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-    // Firebase Web App configuration
+    // Firebase project configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBNDAZ89Q_ms4tsAGI3r5m_4ftqucQJHvc",
       authDomain: "gaurav-grocery.firebaseapp.com",
@@ -202,49 +267,28 @@
       measurementId: "G-8KNHQNEJ67"
     };
 
-    // Must match the authorized admin account and Firestore Rules.
     const ADMIN_EMAIL = "sai.trading1991@gmail.com";
-
-    const STATUSES = [
-      "Pending",
-      "Confirmed",
-      "Preparing",
-      "Out for Delivery",
-      "Delivered",
-      "Cancelled"
-    ];
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const loginPanel = document.getElementById("loginPanel");
-    const ordersPanel = document.getElementById("ordersPanel");
-    const loginForm = document.getElementById("loginForm");
-    const loginMessage = document.getElementById("loginMessage");
-    const pageMessage = document.getElementById("pageMessage");
-    const ordersList = document.getElementById("ordersList");
-    const loginButton = document.getElementById("loginButton");
+    const $ = id => document.getElementById(id);
 
-    let handlingUnauthorizedUser = false;
+    const loginPanel = $("loginPanel");
+    const adminPanel = $("adminPanel");
+    const ordersPanel = $("ordersPanel");
+    const productsPanel = $("productsPanel");
 
-    function normalizeEmail(email) {
-      return String(email || "").trim().toLowerCase();
+    let currentUser = null;
+    let productsCache = [];
+
+    function showMessage(id, message, isError = false) {
+      const el = $(id);
+      el.textContent = message;
+      el.className = "message " + (isError ? "error" : "success");
     }
 
-    function isAuthorized(user) {
-      return Boolean(
-        user &&
-        normalizeEmail(user.email) === normalizeEmail(ADMIN_EMAIL)
-      );
-    }
-
-    function showMessage(element, message, isError = false) {
-      element.textContent = message;
-      element.className = isError ? "error" : "success";
-    }
-
-    // Safely escape values before inserting them into HTML.
     function escapeHTML(value) {
       return String(value ?? "").replace(/[&<>"']/g, char => ({
         "&": "&amp;",
@@ -255,224 +299,342 @@
       })[char]);
     }
 
-    // Admin login
-    loginForm.addEventListener("submit", async event => {
+    function money(value) {
+      const amount = Number(value);
+      return "₹" + (Number.isFinite(amount) ? amount : 0).toLocaleString(
+        "en-IN", { maximumFractionDigits: 2 }
+      );
+    }
+
+    function dateText(value) {
+      if (value && typeof value.toDate === "function") {
+        return value.toDate().toLocaleString("en-IN");
+      }
+
+      if (typeof value === "number" && Number.isFinite(value)) {
+        return new Date(value).toLocaleString("en-IN");
+      }
+
+      if (typeof value === "string" && value) {
+        const parsed = new Date(value);
+        if (!Number.isNaN(parsed.getTime())) {
+          return parsed.toLocaleString("en-IN");
+        }
+      }
+
+      return "Date unavailable";
+    }
+
+    // LOGIN
+    $("loginForm").addEventListener("submit", async event => {
       event.preventDefault();
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      loginButton.disabled = true;
-      showMessage(loginMessage, "Signing in...");
+      $("loginBtn").disabled = true;
+      showMessage("loginMessage", "Logging in...");
 
       try {
+        const email = $("email").value.trim().toLowerCase();
+        const password = $("password").value;
+
+        if (email !== ADMIN_EMAIL) {
+          throw new Error("Is email ko admin access nahi diya gaya hai.");
+        }
+
         await signInWithEmailAndPassword(auth, email, password);
-        // onAuthStateChanged checks whether the account is authorized.
+        $("password").value = "";
       } catch (error) {
         showMessage(
-          loginMessage,
-          "Login failed: " + error.message,
+          "loginMessage",
+          error.code === "auth/invalid-credential"
+            ? "Email ya password galat hai."
+            : error.message || "Login failed.",
           true
         );
       } finally {
-        loginButton.disabled = false;
+        $("loginBtn").disabled = false;
       }
     });
 
-    // Logout
-    document.getElementById("logoutButton").addEventListener(
-      "click",
-      async () => {
-        try {
-          await signOut(auth);
-          showMessage(loginMessage, "You have logged out.");
-        } catch (error) {
-          showMessage(
-            pageMessage,
-            "Logout failed: " + error.message,
-            true
-          );
-        }
-      }
-    );
-
-    // Refresh orders
-    document.getElementById("refreshButton").addEventListener(
-      "click",
-      loadOrders
-    );
-
-    // Watch login state and enforce the admin email check.
-    onAuthStateChanged(auth, async user => {
-      if (!user) {
-        loginPanel.classList.remove("hidden");
-        ordersPanel.classList.add("hidden");
-        ordersList.replaceChildren();
-        return;
-      }
-
-      if (!isAuthorized(user)) {
-        if (handlingUnauthorizedUser) return;
-        handlingUnauthorizedUser = true;
-
-        const actualEmail = user.email || "(email missing)";
-        const configuredEmail = ADMIN_EMAIL;
-
-        loginPanel.classList.remove("hidden");
-        ordersPanel.classList.add("hidden");
-        ordersList.replaceChildren();
-
-        try {
-          await signOut(auth);
-        } catch (error) {
-          console.error("Sign-out error:", error);
-        }
-
-        showMessage(
-          loginMessage,
-          "Email mismatch.\n" +
-          "Firebase email: " + actualEmail + "\n" +
-          "Admin email in code: " + configuredEmail,
-          true
-        );
-
-        handlingUnauthorizedUser = false;
-        return;
-      }
-
-      loginPanel.classList.add("hidden");
-      ordersPanel.classList.remove("hidden");
-
-      document.getElementById("signedInAs").textContent =
-        "Signed in as " + user.email;
-
-      await loadOrders();
-    });
-
-    // Load orders from Firestore.
-    async function loadOrders() {
-      ordersList.replaceChildren();
-      showMessage(pageMessage, "Loading orders...");
-
-      if (!isAuthorized(auth.currentUser)) {
-        showMessage(pageMessage, "Please sign in with the admin account.", true);
-        return;
-      }
-
+    $("logoutBtn").addEventListener("click", async () => {
       try {
-        const ordersQuery = query(
-          collection(db, "orders"),
-          orderBy("createdAt", "desc")
-        );
+        await signOut(auth);
+      } catch (error) {
+        alert("Logout error: " + error.message);
+      }
+    });
 
-        const snapshot = await getDocs(ordersQuery);
+    // TABS
+    $("ordersTab").addEventListener("click", () => {
+      ordersPanel.classList.remove("hidden");
+      productsPanel.classList.add("hidden");
+      loadOrders();
+    });
 
-        if (snapshot.empty) {
-          showMessage(pageMessage, "No orders found.");
-          return;
+    $("productsTab").addEventListener("click", () => {
+      ordersPanel.classList.add("hidden");
+      productsPanel.classList.remove("hidden");
+      loadProducts();
+    });
+
+    // Only signed-in admin can perform panel actions.
+    function requireAdmin() {
+      if (!currentUser ||
+          currentUser.email?.toLowerCase() !== ADMIN_EMAIL) {
+        throw new Error("Admin permission required. Please login again.");
+      }
+    }
+
+    // ORDERS
+    async function loadOrders() {
+      try {
+        requireAdmin();
+        $("ordersMessage").textContent = "Orders load ho rahe hain...";
+
+        let snapshot;
+
+        try {
+          snapshot = await getDocs(
+            query(collection(db, "orders"), orderBy("createdAt", "desc"))
+          );
+        } catch (error) {
+          // Fallback if some older orders do not have createdAt.
+          if (error.code === "permission-denied") throw error;
+          snapshot = await getDocs(collection(db, "orders"));
         }
 
-        showMessage(pageMessage, "Orders found: " + snapshot.size);
+        const orders = snapshot.docs.map(orderDoc => ({
+          id: orderDoc.id,
+          ...orderDoc.data()
+        }));
 
-        snapshot.forEach(orderDoc => {
-          const order = orderDoc.data();
+        orders.sort((a, b) => {
+          const time = value => {
+            if (typeof value === "number") return value;
+            if (value && typeof value.toMillis === "function") {
+              return value.toMillis();
+            }
+            return 0;
+          };
+          return time(b.createdAt) - time(a.createdAt);
+        });
+
+        const list = $("ordersList");
+        list.replaceChildren();
+
+        if (!orders.length) {
+          list.innerHTML = '<p class="empty">Abhi koi order nahi hai.</p>';
+        }
+
+        for (const order of orders) {
           const card = document.createElement("article");
-          card.className = "order";
+          card.className = "card";
 
           const items = Array.isArray(order.items) ? order.items : [];
-
           const itemsHTML = items.map(item => `
-            <li>
-              ${escapeHTML(item.name)} × ${escapeHTML(item.quantity)}
-              — ₹${escapeHTML(
-                Number(item.unitPrice || 0) *
-                Number(item.quantity || 0)
-              )}
+            <li>${escapeHTML(item.name || item.productName || item.productId || "Product")}
+              × ${escapeHTML(item.quantity ?? 1)}
+              — ${money((Number(item.unitPrice) || 0) *
+                (Number(item.quantity) || 1))}
             </li>
           `).join("");
 
-          const date = order.createdAt
-            ? new Date(Number(order.createdAt)).toLocaleString()
-            : "Not available";
-
-          const currentStatus = STATUSES.includes(order.status)
-            ? order.status
-            : "Pending";
+          const status = String(order.status || "Pending");
+          const statuses = ["Pending", "Confirmed", "Processing",
+            "Out for Delivery", "Delivered", "Cancelled"];
 
           card.innerHTML = `
-            <h3>Order ID: ${escapeHTML(orderDoc.id)}</h3>
-
-            <div class="details">
-              <b>Customer:</b> ${escapeHTML(order.customerName)}<br>
-              <b>Phone:</b> ${escapeHTML(order.phone)}<br>
-              <b>Address:</b> ${escapeHTML(order.address)}<br>
-              <b>Total:</b> ₹${escapeHTML(order.totalPrice)}<br>
-              <b>Created:</b> ${escapeHTML(date)}
-            </div>
-
-            <h4>Items</h4>
-            <ul class="item-list">
-              ${itemsHTML || "<li>No items</li>"}
-            </ul>
-
-            <label>Status</label>
-            <div class="status-row">
-              <select class="statusSelect" aria-label="Order status">
-                ${STATUSES.map(status => `
-                  <option value="${escapeHTML(status)}"
-                    ${status === currentStatus ? "selected" : ""}>
-                    ${escapeHTML(status)}
-                  </option>
-                `).join("")}
-              </select>
-
-              <button class="saveStatus" type="button">
-                Save Status
-              </button>
-            </div>
-
-            <p class="orderMessage muted" role="status"></p>
+            <h3>Order #${escapeHTML(order.id)}</h3>
+            <p><strong>Customer:</strong>
+              ${escapeHTML(order.customerName || "N/A")}</p>
+            <p><strong>Phone:</strong>
+              ${escapeHTML(order.phone || "N/A")}</p>
+            <p><strong>Address:</strong>
+              ${escapeHTML(order.address || "N/A")}</p>
+            <p><strong>Date:</strong>
+              ${escapeHTML(dateText(order.createdAt))}</p>
+            <p><strong>Items:</strong></p>
+            <ul>${itemsHTML || "<li>No item details</li>"}</ul>
+            <p class="price">Total: ${money(order.totalPrice)}</p>
+            <p>Status: <span class="status">${escapeHTML(status)}</span></p>
+            <label>Update Status</label>
+            <select class="order-status">
+              ${statuses.map(s =>
+                `<option value="${escapeHTML(s)}"
+                  ${s === status ? "selected" : ""}>
+                  ${escapeHTML(s)}
+                </option>`
+              ).join("")}
+              ${statuses.includes(status) ? "" :
+                `<option selected value="${escapeHTML(status)}">
+                  ${escapeHTML(status)}
+                </option>`}
+            </select>
+            <button class="save-status">Save Status</button>
           `;
 
-          const select = card.querySelector(".statusSelect");
-          const saveButton = card.querySelector(".saveStatus");
-          const message = card.querySelector(".orderMessage");
+          card.querySelector(".save-status").addEventListener("click",
+            async event => {
+              const button = event.currentTarget;
+              button.disabled = true;
 
-          saveButton.addEventListener("click", async () => {
-            if (!isAuthorized(auth.currentUser)) {
-              showMessage(message, "Admin login required.", true);
-              return;
-            }
+              try {
+                requireAdmin();
+                const newStatus = card.querySelector(".order-status").value;
+                await updateDoc(doc(db, "orders", order.id), {
+                  status: newStatus
+                });
+                showMessage("ordersMessage", "Order status updated.");
+                await loadOrders();
+              } catch (error) {
+                showMessage("ordersMessage",
+                  "Status update failed: " + error.message, true);
+                button.disabled = false;
+              }
+            });
 
-            saveButton.disabled = true;
+          list.appendChild(card);
+        }
 
-            try {
-              await updateDoc(doc(db, "orders", orderDoc.id), {
-                status: select.value
-              });
-
-              showMessage(message, "Status updated successfully.");
-            } catch (error) {
-              showMessage(
-                message,
-                "Update failed: " + error.message,
-                true
-              );
-            } finally {
-              saveButton.disabled = false;
-            }
-          });
-
-          ordersList.appendChild(card);
-        });
+        $("ordersMessage").textContent = `Total orders: ${orders.length}`;
+        $("ordersMessage").className = "message success";
       } catch (error) {
-        showMessage(
-          pageMessage,
-          "Could not load orders: " + error.message,
-          true
-        );
+        showMessage("ordersMessage",
+          "Orders load nahi hue: " + error.message, true);
+        $("ordersList").innerHTML =
+          '<p class="empty">Firebase rules aur connection check karein.</p>';
       }
     }
-  </script>
-</body>
-</html>
+
+    // PRODUCTS
+    async function loadProducts() {
+      try {
+        requireAdmin();
+        $("productList").innerHTML =
+          '<p class="empty">Products load ho rahe hain...</p>';
+
+        const snapshot = await getDocs(collection(db, "products"));
+
+        productsCache = snapshot.docs.map(productDoc => ({
+          id: productDoc.id,
+          ...productDoc.data()
+        }));
+
+        productsCache.sort((a, b) =>
+          String(a.name || "").localeCompare(String(b.name || ""))
+        );
+
+        $("productCount").textContent =
+          `Total products: ${productsCache.length}`;
+
+        const list = $("productList");
+        list.replaceChildren();
+
+        if (!productsCache.length) {
+          list.innerHTML =
+            '<p class="empty">Abhi product nahi hai. Upar form se add karein.</p>';
+          return;
+        }
+
+        for (const product of productsCache) {
+          const card = document.createElement("article");
+          card.className = "card";
+
+          const emoji = escapeHTML(product.emoji || "🛒");
+          const imageUrl = typeof product.imageUrl === "string"
+            ? product.imageUrl.trim() : "";
+
+          // Only display HTTP(S) images.
+          let safeImage = "";
+          try {
+            const url = new URL(imageUrl);
+            if (url.protocol === "https:" || url.protocol === "http:") {
+              safeImage = url.href;
+            }
+          } catch (_) {}
+
+          const stock = product.inStock !== false;
+          const active = product.active !== false;
+
+          card.innerHTML = `
+            ${safeImage
+              ? `<img src="${escapeHTML(safeImage)}"
+                  alt="${escapeHTML(product.name || "Product")}"
+                  loading="lazy"
+                  style="width:100%;height:150px;object-fit:contain"
+                  onerror="this.style.display='none'">`
+              : `<div style="font-size:48px;text-align:center;padding:12px">
+                  ${emoji}</div>`}
+            <h3>${escapeHTML(product.name || "Unnamed Product")}</h3>
+            <p class="muted">${escapeHTML(product.category || "Uncategorized")}
+              · ${escapeHTML(product.unit || "")}</p>
+            <p class="price">${money(product.price)}</p>
+            <p>Stock: <strong>${stock ? "In Stock" : "Out of Stock"}</strong></p>
+            <p>Visibility: <strong>${active ? "Active" : "Hidden"}</strong></p>
+            <p>${escapeHTML(product.description || "")}</p>
+            <button class="edit-product">Edit</button>
+            <button class="stock-product ${stock ? "warning" : ""}">
+              ${stock ? "Mark Out of Stock" : "Mark In Stock"}
+            </button>
+            <button class="visibility-product secondary">
+              ${active ? "Hide Product" : "Show Product"}
+            </button>
+            <button class="delete-product danger">Delete</button>
+          `;
+
+          card.querySelector(".edit-product").addEventListener("click", () => {
+            $("productId").value = product.id;
+            $("productName").value = product.name || "";
+            $("productCategory").value = product.category || "";
+            $("productUnit").value = product.unit || "";
+            $("productPrice").value = Number(product.price) || "";
+            $("productEmoji").value = product.emoji || "🛒";
+            $("productImage").value = product.imageUrl || "";
+            $("productDescription").value = product.description || "";
+            $("productInStock").checked = stock;
+            $("productFormTitle").textContent = "Edit Product";
+            $("saveProductBtn").textContent = "Save Changes";
+            $("cancelEditBtn").classList.remove("hidden");
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+
+          card.querySelector(".stock-product").addEventListener("click",
+            () => updateProduct(product.id, {
+              inStock: !stock,
+              updatedAt: Date.now()
+            }, "Stock updated."));
+
+          card.querySelector(".visibility-product").addEventListener("click",
+            () => updateProduct(product.id, {
+              active: !active,
+              updatedAt: Date.now()
+            }, "Product visibility updated."));
+
+          card.querySelector(".delete-product").addEventListener("click",
+            async () => {
+              if (!confirm(
+                `Kya aap "${product.name || "this product"}" delete karna chahte hain?`
+              )) return;
+
+              try {
+                requireAdmin();
+                await deleteDoc(doc(db, "products", product.id));
+                showMessage("productMessage", "Product deleted.");
+                await loadProducts();
+              } catch (error) {
+                showMessage("productMessage",
+                  "Delete failed: " + error.message, true);
+              }
+            });
+
+          list.appendChild(card);
+        }
+      } catch (error) {
+        $("productList").innerHTML =
+          '<p class="empty">Products load nahi hue.</p>';
+        showMessage("productMessage",
+          "Error: " + error.message +
+          ". Firestore products rules check karein.", true);
+      }
+    }
+
+    async function updateProduct(id
