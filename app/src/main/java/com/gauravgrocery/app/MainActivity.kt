@@ -22,9 +22,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.firestore
+import java.util.Locale
 
 data class GroceryProduct(
     val id: String,
@@ -87,7 +87,6 @@ fun GroceryApp() {
         mutableStateOf(false)
     }
 
-    // Live products from Firebase Firestore
     DisposableEffect(Unit) {
         val registration: ListenerRegistration =
             Firebase.firestore.collection("products")
@@ -116,8 +115,7 @@ fun GroceryApp() {
 
                                 GroceryProduct(
                                     id = document.id,
-                                    name = document.getString("name")
-                                        ?: "",
+                                    name = document.getString("name") ?: "",
                                     category = document.getString("category")
                                         ?: "Other",
                                     price = priceValue?.toDouble() ?: 0.0,
@@ -139,7 +137,6 @@ fun GroceryApp() {
         }
     }
 
-    // Keep cart prices and stock in sync with current Firebase products.
     LaunchedEffect(groceryProducts) {
         for (index in cart.indices.reversed()) {
             val latest = groceryProducts.find {
@@ -161,7 +158,6 @@ fun GroceryApp() {
             .distinct()
             .sorted()
 
-    // If a category was removed in Admin, return to All.
     LaunchedEffect(categories) {
         if (selectedCategory !in categories) {
             selectedCategory = "All"
@@ -261,7 +257,6 @@ fun GroceryApp() {
                         showCart = false
                     },
                     onQuantityChange = { product, change ->
-
                         val index = cart.indexOfFirst {
                             it.product.id == product.id
                         }
@@ -358,7 +353,6 @@ fun GroceryApp() {
                                     selectedCategory = it
                                 },
                                 onAddToCart = { product ->
-
                                     if (!product.inStock) {
                                         Toast.makeText(
                                             context,
@@ -418,9 +412,7 @@ fun ProductScreen(
         OutlinedTextField(
             value = searchText,
             onValueChange = onSearchChange,
-            label = {
-                Text("Search groceries")
-            },
+            label = { Text("Search groceries") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -436,9 +428,7 @@ fun ProductScreen(
                     onClick = {
                         onCategoryChange(category)
                     },
-                    label = {
-                        Text(category)
-                    }
+                    label = { Text(category) }
                 )
             }
         }
@@ -467,7 +457,9 @@ fun ProductScreen(
             }
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(
@@ -545,8 +537,7 @@ fun ProductCard(
                 enabled = product.inStock
             ) {
                 Text(
-                    if (product.inStock) "Add"
-                    else "Out of Stock"
+                    if (product.inStock) "Add" else "Out of Stock"
                 )
             }
         }
@@ -557,11 +548,7 @@ private fun formatPrice(price: Double): String {
     return if (price % 1.0 == 0.0) {
         price.toLong().toString()
     } else {
-        String.format(
-            java.util.Locale.US,
-            "%.2f",
-            price
-        )
+        String.format(Locale.US, "%.2f", price)
     }
 }
 
@@ -604,48 +591,58 @@ fun CartScreen(
                     items = cart,
                     key = { it.product.id }
                 ) { item ->
-     
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                item.product.name,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                "₹${formatPrice(item.product.price)} × ${item.quantity}"
-                            )
-                            Text(
-                                "Subtotal: ₹${formatPrice(item.product.price * item.quantity)}"
-                            )
-                        }
-
-                        IconButton(
-                            onClick = {
-                                onQuantityChange(item.product, -1)
-                            }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                Icons.Default.Remove,
-                                contentDescription = "Decrease quantity"
-                            )
-                        }
-
-                        Text(item.quantity.toString())
-
-                        IconButton(
-                            onClick = {
-                                onQuantityChange(item.product, 1)
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    item.product.name,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    "₹${formatPrice(item.product.price)} × ${item.quantity}"
+                                )
+                                Text(
+                                    "Subtotal: ₹${
+                                        formatPrice(
+                                            item.product.price *
+                                                item.quantity
+                                        )
+                                    }"
+                                )
                             }
-                        ) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = "Increase quantity"
-                            )
+
+                            IconButton(
+                                onClick = {
+                                    onQuantityChange(item.product, -1)
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.Remove,
+                                    contentDescription = "Decrease quantity"
+                                )
+                            }
+
+                            Text(item.quantity.toString())
+
+                            IconButton(
+                                onClick = {
+                                    onQuantityChange(item.product, 1)
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = "Increase quantity"
+                                )
+                            }
                         }
                     }
                 }
@@ -662,7 +659,9 @@ fun CartScreen(
 
         Spacer(Modifier.height(8.dp))
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             OutlinedButton(
                 onClick = onBack,
                 modifier = Modifier.weight(1f)
@@ -687,9 +686,19 @@ fun CheckoutScreen(
     onBack: () -> Unit,
     onPlaceOrder: (String, String, String) -> Unit
 ) {
-    var customerName by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    var customerName by remember {
+        mutableStateOf("")
+    }
+
+    var phone by remember {
+        mutableStateOf("")
+    }
+
+    var address by remember {
+        mutableStateOf("")
+    }
 
     Column(
         modifier = Modifier
@@ -715,8 +724,9 @@ fun CheckoutScreen(
         OutlinedTextField(
             value = phone,
             onValueChange = {
-                phone = it.filter { character -> character.isDigit() }
-                    .take(10)
+                phone = it.filter { character ->
+                    character.isDigit()
+                }.take(10)
             },
             label = { Text("Mobile number") },
             singleLine = true,
@@ -739,12 +749,13 @@ fun CheckoutScreen(
 
         Button(
             onClick = {
-                if (customerName.isBlank() ||
+                if (
+                    customerName.isBlank() ||
                     phone.length != 10 ||
                     address.isBlank()
                 ) {
                     Toast.makeText(
-                        LocalContext.current,
+                        context,
                         "Name, valid 10-digit mobile number and address enter karein.",
                         Toast.LENGTH_LONG
                     ).show()
@@ -810,4 +821,3 @@ private fun saveGroceryOrder(
             )
         }
 }
-
