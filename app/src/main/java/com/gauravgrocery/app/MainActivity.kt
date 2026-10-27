@@ -605,3 +605,209 @@ fun CartScreen(
                     key = { it.product.id }
                 ) { item ->
      
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                item.product.name,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "₹${formatPrice(item.product.price)} × ${item.quantity}"
+                            )
+                            Text(
+                                "Subtotal: ₹${formatPrice(item.product.price * item.quantity)}"
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                onQuantityChange(item.product, -1)
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.Remove,
+                                contentDescription = "Decrease quantity"
+                            )
+                        }
+
+                        Text(item.quantity.toString())
+
+                        IconButton(
+                            onClick = {
+                                onQuantityChange(item.product, 1)
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "Increase quantity"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            "Total: ₹${formatPrice(totalPrice)}",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Back to Shop")
+            }
+
+            Button(
+                onClick = onCheckout,
+                enabled = cart.isNotEmpty(),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Checkout")
+            }
+        }
+    }
+}
+
+@Composable
+fun CheckoutScreen(
+    totalPrice: Double,
+    onBack: () -> Unit,
+    onPlaceOrder: (String, String, String) -> Unit
+) {
+    var customerName by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            "Checkout",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        OutlinedTextField(
+            value = customerName,
+            onValueChange = { customerName = it },
+            label = { Text("Customer name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = phone,
+            onValueChange = {
+                phone = it.filter { character -> character.isDigit() }
+                    .take(10)
+            },
+            label = { Text("Mobile number") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = address,
+            onValueChange = { address = it },
+            label = { Text("Delivery address") },
+            minLines = 3,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Text(
+            "Order total: ₹${formatPrice(totalPrice)}",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Button(
+            onClick = {
+                if (customerName.isBlank() ||
+                    phone.length != 10 ||
+                    address.isBlank()
+                ) {
+                    Toast.makeText(
+                        LocalContext.current,
+                        "Name, valid 10-digit mobile number and address enter karein.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    onPlaceOrder(
+                        customerName.trim(),
+                        phone,
+                        address.trim()
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Place Order")
+        }
+
+        OutlinedButton(
+            onClick = onBack,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Back to Cart")
+        }
+    }
+}
+
+private fun saveGroceryOrder(
+    customerName: String,
+    phone: String,
+    address: String,
+    cart: List<CartItem>,
+    totalPrice: Double,
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+) {
+    val orderItems = cart.map { item ->
+        mapOf(
+            "productId" to item.product.id,
+            "name" to item.product.name,
+            "quantity" to item.quantity,
+            "unitPrice" to item.product.price
+        )
+    }
+
+    val order = hashMapOf(
+        "customerName" to customerName,
+        "phone" to phone,
+        "address" to address,
+        "items" to orderItems,
+        "totalPrice" to totalPrice,
+        "status" to "Pending",
+        "createdAt" to System.currentTimeMillis()
+    )
+
+    Firebase.firestore
+        .collection("orders")
+        .add(order)
+        .addOnSuccessListener {
+            onSuccess()
+        }
+        .addOnFailureListener { error ->
+            onError(
+                error.localizedMessage ?: "Order save nahi ho paaya."
+            )
+        }
+}
+
