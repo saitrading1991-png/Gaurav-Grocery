@@ -5,51 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gaurav Grocery Admin</title>
   <meta name="theme-color" content="#166534">
+
   <style>
     * { box-sizing: border-box; }
+
     body {
-      margin: 0; font-family: Arial, sans-serif;
-      background: #f3f7f3; color: #17251a;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f7f3;
+      color: #17251a;
     }
+
     header {
-      background: #166534; color: white;
+      background: #166534;
+      color: white;
       padding: 20px 16px;
     }
-    header h1 { margin: 0 0 6px; font-size: 24px; }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
     header p { margin: 0; }
-    main { max-width: 1000px; margin: auto; padding: 16px; }
+
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 16px;
+    }
+
     .panel, .order {
-      background: white; border-radius: 12px;
-      padding: 16px; margin-bottom: 16px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
       box-shadow: 0 2px 8px #0000000d;
     }
+
     input, select, button {
-      width: 100%; padding: 12px; margin: 6px 0;
-      border-radius: 8px; border: 1px solid #cbd5cc;
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border-radius: 8px;
+      border: 1px solid #cbd5cc;
       font-size: 16px;
     }
+
     button {
-      background: #166534; color: white;
-      border: 0; font-weight: bold; cursor: pointer;
+      background: #166534;
+      color: white;
+      border: 0;
+      font-weight: bold;
+      cursor: pointer;
     }
+
     button.secondary { background: #475569; }
-    button:disabled { opacity: .55; }
+    button:disabled { opacity: .55; cursor: wait; }
+
     .hidden { display: none !important; }
-    .muted { color: #647067; font-size: 14px; }
-    .error { color: #b91c1c; white-space: pre-wrap; }
-    .success { color: #166534; }
-    .order h3 { margin-top: 0; overflow-wrap: anywhere; }
-    .details { line-height: 1.6; overflow-wrap: anywhere; }
-    .status-row {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+
+    .muted {
+      color: #647067;
+      font-size: 14px;
     }
-    .status-row select, .status-row button { min-width: 0; }
+
+    .error {
+      color: #b91c1c;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .success {
+      color: #166534;
+      white-space: pre-wrap;
+    }
+
+    .order h3 {
+      margin-top: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .details {
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .status-row select, .status-row button {
+      min-width: 0;
+    }
+
     .item-list { padding-left: 20px; }
+
     @media (max-width: 480px) {
       .status-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>🛒 Gaurav Grocery</h1>
@@ -60,25 +119,41 @@
     <section id="loginPanel" class="panel">
       <h2>Admin Login</h2>
       <p class="muted">Sign in using your authorized admin account.</p>
+
       <form id="loginForm">
         <label for="email">Admin email</label>
-        <input id="email" type="email" autocomplete="username"
-          required placeholder="admin@example.com">
+        <input
+          id="email"
+          type="email"
+          autocomplete="username"
+          required
+          placeholder="admin@example.com"
+        >
+
         <label for="password">Password</label>
-        <input id="password" type="password"
-          autocomplete="current-password" required>
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+
         <button id="loginButton" type="submit">Login</button>
       </form>
-      <p id="loginMessage" role="status"></p>
+
+      <p id="loginMessage" role="status" aria-live="polite"></p>
     </section>
 
     <section id="ordersPanel" class="hidden">
       <div class="panel">
         <p id="signedInAs" class="muted"></p>
-        <button id="refreshButton">Refresh Orders</button>
-        <button id="logoutButton" class="secondary">Logout</button>
-        <p id="pageMessage" role="status"></p>
+        <button id="refreshButton" type="button">Refresh Orders</button>
+        <button id="logoutButton" class="secondary" type="button">
+          Logout
+        </button>
+        <p id="pageMessage" role="status" aria-live="polite"></p>
       </div>
+
       <div id="ordersList"></div>
     </section>
   </main>
@@ -86,28 +161,38 @@
   <script type="module">
     import { initializeApp } from
       "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
     import {
-      getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
       signOut
-    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    } from
+      "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
     import {
-      getFirestore, collection, getDocs, query, orderBy,
-      doc, updateDoc
-    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+      getFirestore,
+      collection,
+      getDocs,
+      query,
+      orderBy,
+      doc,
+      updateDoc
+    } from
+      "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-    // STEP A: Replace these values with your Firebase Web App config.
+    // Firebase Web App configuration
     const firebaseConfig = {
-  apiKey: "AIzaSyBNDAZ89Q_ms4tsAGI3r5m_4ftqucQJHvc",
-  authDomain: "gaurav-grocery.firebaseapp.com",
-  projectId: "gaurav-grocery",
-  storageBucket: "gaurav-grocery.firebasestorage.app",
-  messagingSenderId: "517960988134",
-  appId: "1:517960988134:web:9dd8e2455cfbec257bd227",
-  measurementId: "G-8KNHQNEJ67"
-};
-    
+      apiKey: "AIzaSyBNDAZ89Q_ms4tsAGI3r5m_4ftqucQJHvc",
+      authDomain: "gaurav-grocery.firebaseapp.com",
+      projectId: "gaurav-grocery",
+      storageBucket: "gaurav-grocery.firebasestorage.app",
+      messagingSenderId: "517960988134",
+      appId: "1:517960988134:web:9dd8e2455cfbec257bd227",
+      measurementId: "G-8KNHQNEJ67"
+    };
 
-    // STEP B: Use the same admin email in Firestore Rules.
+    // Must match the authorized admin account and Firestore Rules.
     const ADMIN_EMAIL = "sai.tradin1991@gmail.com";
 
     const STATUSES = [
@@ -129,7 +214,27 @@
     const loginMessage = document.getElementById("loginMessage");
     const pageMessage = document.getElementById("pageMessage");
     const ordersList = document.getElementById("ordersList");
+    const loginButton = document.getElementById("loginButton");
 
+    let handlingUnauthorizedUser = false;
+
+    function normalizeEmail(email) {
+      return String(email || "").trim().toLowerCase();
+    }
+
+    function isAuthorized(user) {
+      return Boolean(
+        user &&
+        normalizeEmail(user.email) === normalizeEmail(ADMIN_EMAIL)
+      );
+    }
+
+    function showMessage(element, message, isError = false) {
+      element.textContent = message;
+      element.className = isError ? "error" : "success";
+    }
+
+    // Safely escape values before inserting them into HTML.
     function escapeHTML(value) {
       return String(value ?? "").replace(/[&<>"']/g, char => ({
         "&": "&amp;",
@@ -140,53 +245,19 @@
       })[char]);
     }
 
-    function showMessage(element, message, isError = false) {
-      element.textContent = message;
-      element.className = isError ? "error" : "success";
-    }
-
-    function isAuthorized(user) {
-  const userEmail = (user?.email || "").trim().toLowerCase();
-  const adminEmail = ADMIN_EMAIL.trim().toLowerCase();
-
-  console.log("Firebase email:", JSON.stringify(userEmail));
-  console.log("Admin email:", JSON.stringify(adminEmail));
-
-  return userEmail !== "" && userEmail === adminEmail;
-    }
-
+    // Admin login
     loginForm.addEventListener("submit", async event => {
       event.preventDefault();
+
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-      const button = document.getElementById("loginButton");
 
-      button.disabled = true;
+      loginButton.disabled = true;
       showMessage(loginMessage, "Signing in...");
 
       try {
-        const result = await signInWithEmailAndPassword(
-          auth, email, password
-        );
-
-        if (!isAuthorized(result.user)) {
-  const actualEmail = result.user.email || "(email missing)";
-  const configuredEmail = ADMIN_EMAIL;
-
-  await signOut(auth);
-
-  showMessage(
-    loginMessage,
-    "Email mismatch.\n" +
-    "Firebase email: " + actualEmail + "\n" +
-    "Admin email in code: " + configuredEmail,
-    true
-  );
-} else {
-  showMessage(loginMessage, "Login successful.");
-        }else {
-  showMessage(loginMessage, "Login successful.");
-        }
+        await signInWithEmailAndPassword(auth, email, password);
+        // onAuthStateChanged checks whether the account is authorized.
       } catch (error) {
         showMessage(
           loginMessage,
@@ -194,52 +265,96 @@
           true
         );
       } finally {
-        button.disabled = false;
+        loginButton.disabled = false;
       }
     });
 
+    // Logout
     document.getElementById("logoutButton").addEventListener(
-      "click", async () => {
-        await signOut(auth);
-      }
-    );
-
-    document.getElementById("refreshButton").addEventListener(
-      "click", loadOrders
-    );
-
-    onAuthStateChanged(auth, async user => {
-      if (user && isAuthorized(user)) {
-        loginPanel.classList.add("hidden");
-        ordersPanel.classList.remove("hidden");
-        document.getElementById("signedInAs").textContent =
-          "Signed in as " + user.email;
-        await loadOrders();
-      } else {
-        ordersPanel.classList.add("hidden");
-        loginPanel.classList.remove("hidden");
-        ordersList.replaceChildren();
-
-        if (user) {
+      "click",
+      async () => {
+        try {
           await signOut(auth);
+          showMessage(loginMessage, "You have logged out.");
+        } catch (error) {
           showMessage(
-            loginMessage,
-            "Access denied. Use the verified admin account.",
+            pageMessage,
+            "Logout failed: " + error.message,
             true
           );
         }
       }
+    );
+
+    // Refresh orders
+    document.getElementById("refreshButton").addEventListener(
+      "click",
+      loadOrders
+    );
+
+    // Watch login state and enforce the admin email check.
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        loginPanel.classList.remove("hidden");
+        ordersPanel.classList.add("hidden");
+        ordersList.replaceChildren();
+        return;
+      }
+
+      if (!isAuthorized(user)) {
+        if (handlingUnauthorizedUser) return;
+        handlingUnauthorizedUser = true;
+
+        const actualEmail = user.email || "(email missing)";
+        const configuredEmail = ADMIN_EMAIL;
+
+        loginPanel.classList.remove("hidden");
+        ordersPanel.classList.add("hidden");
+        ordersList.replaceChildren();
+
+        try {
+          await signOut(auth);
+        } catch (error) {
+          console.error("Sign-out error:", error);
+        }
+
+        showMessage(
+          loginMessage,
+          "Email mismatch.\n" +
+          "Firebase email: " + actualEmail + "\n" +
+          "Admin email in code: " + configuredEmail,
+          true
+        );
+
+        handlingUnauthorizedUser = false;
+        return;
+      }
+
+      loginPanel.classList.add("hidden");
+      ordersPanel.classList.remove("hidden");
+
+      document.getElementById("signedInAs").textContent =
+        "Signed in as " + user.email;
+
+      await loadOrders();
     });
 
+    // Load orders from Firestore.
     async function loadOrders() {
       ordersList.replaceChildren();
       showMessage(pageMessage, "Loading orders...");
+
+      if (!isAuthorized(auth.currentUser)) {
+        showMessage(pageMessage, "Please sign in with the admin account.", true);
+        return;
+      }
 
       try {
         const ordersQuery = query(
           collection(db, "orders"),
           orderBy("createdAt", "desc")
         );
+
         const snapshot = await getDocs(ordersQuery);
 
         if (snapshot.empty) {
@@ -255,13 +370,15 @@
           card.className = "order";
 
           const items = Array.isArray(order.items) ? order.items : [];
+
           const itemsHTML = items.map(item => `
-            <li>${escapeHTML(item.name)} ×
-              ${escapeHTML(item.quantity)} —
-              ₹${escapeHTML(
+            <li>
+              ${escapeHTML(item.name)} × ${escapeHTML(item.quantity)}
+              — ₹${escapeHTML(
                 Number(item.unitPrice || 0) *
                 Number(item.quantity || 0)
-              )}</li>
+              )}
+            </li>
           `).join("");
 
           const date = order.createdAt
@@ -274,6 +391,7 @@
 
           card.innerHTML = `
             <h3>Order ID: ${escapeHTML(orderDoc.id)}</h3>
+
             <div class="details">
               <b>Customer:</b> ${escapeHTML(order.customerName)}<br>
               <b>Phone:</b> ${escapeHTML(order.phone)}<br>
@@ -281,8 +399,12 @@
               <b>Total:</b> ₹${escapeHTML(order.totalPrice)}<br>
               <b>Created:</b> ${escapeHTML(date)}
             </div>
+
             <h4>Items</h4>
-            <ul class="item-list">${itemsHTML || "<li>No items</li>"}</ul>
+            <ul class="item-list">
+              ${itemsHTML || "<li>No items</li>"}
+            </ul>
+
             <label>Status</label>
             <div class="status-row">
               <select class="statusSelect" aria-label="Order status">
@@ -293,8 +415,12 @@
                   </option>
                 `).join("")}
               </select>
-              <button class="saveStatus">Save Status</button>
+
+              <button class="saveStatus" type="button">
+                Save Status
+              </button>
             </div>
+
             <p class="orderMessage muted" role="status"></p>
           `;
 
@@ -303,18 +429,18 @@
           const message = card.querySelector(".orderMessage");
 
           saveButton.addEventListener("click", async () => {
-            const user = auth.currentUser;
-            
-            if (!isAuthorized(user)) {
+            if (!isAuthorized(auth.currentUser)) {
               showMessage(message, "Admin login required.", true);
               return;
             }
 
             saveButton.disabled = true;
+
             try {
               await updateDoc(doc(db, "orders", orderDoc.id), {
                 status: select.value
               });
+
               showMessage(message, "Status updated successfully.");
             } catch (error) {
               showMessage(
