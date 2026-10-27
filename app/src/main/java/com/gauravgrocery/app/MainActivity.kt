@@ -251,6 +251,127 @@ fun GroceryApp() {
                 )
             }
 
+@Composable
+fun PhoneOtpLoginScreen(
+    onLoginSuccess: () -> Unit
+) {
+    val context = LocalContext.current
+    val auth = remember { FirebaseAuth.getInstance() }
+
+    var phone by remember { mutableStateOf("") }
+    var otp by remember { mutableStateOf("") }
+    var verificationId by remember { mutableStateOf<String?>(null) }
+    var resendToken by remember { mutableStateOf<com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken?>(null) }
+    var message by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+
+    val callbacks = remember {
+        object : com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+            override fun onVerificationCompleted(credential: com.google.firebase.auth.PhoneAuthCredential) {
+                auth.signInWithCredential(credential)
+                    .addOnSuccessListener { onLoginSuccess() }
+                    .addOnFailureListener {
+                        busy = false
+                        message = it.localizedMessage ?: "Login nahi ho paaya."
+                    }
+            }
+
+            override fun onVerificationFailed(e: com.google.firebase.FirebaseException) {
+                busy = false
+                message = e.localizedMessage ?: "OTP bhejne mein dikkat hui."
+            }
+
+            override fun onCodeSent(
+                id: String,
+                token: com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken
+            ) {
+                verificationId = id
+                resendToken = token
+                busy = false
+                message = "OTP SMS bhej diya gaya hai."
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            "Phone OTP Login",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it.filter(Char::isDigit).take(10) },
+            label = { Text("10-digit mobile number") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Button(
+            enabled = phone.length == 10 && !busy,
+            onClick = {
+                busy = true
+                message = ""
+                val options = com.google.firebase.auth.PhoneAuthOptions
+                    .newBuilder(auth)
+                    .setPhoneNumber("+91$phone")
+                    .setTimeout(60L, java.util.concurrent.TimeUnit.SECONDS)
+                    .setActivity(context as ComponentActivity)
+                    .setCallbacks(callbacks)
+                    .build()
+                PhoneAuthProvider.verifyPhoneNumber(options)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (busy) "Please wait..." else "Send OTP")
+        }
+
+        if (verificationId != null) {
+            OutlinedTextField(
+                value = otp,
+                onValueChange = { otp = it.filter(Char::isDigit).take(6) },
+                label = { Text("6-digit OTP") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                enabled = otp.length == 6 && !busy,
+                onClick = {
+                    busy = true
+                    val credential = PhoneAuthProvider.getCredential(
+                        verificationId!!,
+                        otp
+                    )
+                    auth.signInWithCredential(credential)
+                        .addOnSuccessListener {
+                            busy = false
+                            onLoginSuccess()
+                        }
+                        .addOnFailureListener {
+                            busy = false
+                            message = it.localizedMessage ?: "OTP galat hai."
+                        }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Verify OTP & Login")
+            }
+        }
+
+        if (message.isNotBlank()) {
+            Text(message)
+        }
+    }
+}
+
             showCart -> {
                 CartScreen(
                     cart = cart,
