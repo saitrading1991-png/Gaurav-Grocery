@@ -292,6 +292,8 @@
 
           saveButton.addEventListener("click", async () => {
             const user = auth.currentUser;
+            console.log("Login email:", result.user.email);
+console.log("Configured admin email:", ADMIN_EMAIL);
             if (!isAuthorized(user)) {
               showMessage(message, "Admin login required.", true);
               return;
