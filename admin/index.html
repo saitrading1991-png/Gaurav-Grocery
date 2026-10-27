@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gaurav Grocery Admin</title>
+  <meta name="theme-color" content="#166534">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Arial, sans-serif;
+      background: #f3f7f3; color: #17251a;
+    }
+    header {
+      background: #166534; color: white;
+      padding: 20px 16px;
+    }
+    header h1 { margin: 0 0 6px; font-size: 24px; }
+    header p { margin: 0; }
+    main { max-width: 1000px; margin: auto; padding: 16px; }
+    .panel, .order {
+      background: white; border-radius: 12px;
+      padding: 16px; margin-bottom: 16px;
+      box-shadow: 0 2px 8px #0000000d;
+    }
+    input, select, button {
+      width: 100%; padding: 12px; margin: 6px 0;
+      border-radius: 8px; border: 1px solid #cbd5cc;
+      font-size: 16px;
+    }
+    button {
+      background: #166534; color: white;
+      border: 0; font-weight: bold; cursor: pointer;
+    }
+    button.secondary { background: #475569; }
+    button:disabled { opacity: .55; }
+    .hidden { display: none !important; }
+    .muted { color: #647067; font-size: 14px; }
+    .error { color: #b91c1c; white-space: pre-wrap; }
+    .success { color: #166534; }
+    .order h3 { margin-top: 0; overflow-wrap: anywhere; }
+    .details { line-height: 1.6; overflow-wrap: anywhere; }
+    .status-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .status-row select, .status-row button { min-width: 0; }
+    .item-list { padding-left: 20px; }
+    @media (max-width: 480px) {
+      .status-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛒 Gaurav Grocery</h1>
+    <p>Secure Order Admin Panel</p>
+  </header>
+
+  <main>
+    <section id="loginPanel" class="panel">
+      <h2>Admin Login</h2>
+      <p class="muted">Sign in using your authorized admin account.</p>
+      <form id="loginForm">
+        <label for="email">Admin email</label>
+        <input id="email" type="email" autocomplete="username"
+          required placeholder="admin@example.com">
+        <label for="password">Password</label>
+        <input id="password" type="password"
+          autocomplete="current-password" required>
+        <button id="loginButton" type="submit">Login</button>
+      </form>
+      <p id="loginMessage" role="status"></p>
+    </section>
+
+    <section id="ordersPanel" class="hidden">
+      <div class="panel">
+        <p id="signedInAs" class="muted"></p>
+        <button id="refreshButton">Refresh Orders</button>
+        <button id="logoutButton" class="secondary">Logout</button>
+        <p id="pageMessage" role="status"></p>
+      </div>
+      <div id="ordersList"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from
+      "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+    import {
+      getFirestore, collection, getDocs, query, orderBy,
+      doc, updateDoc
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    // STEP A: Replace these values with your Firebase Web App config.
+    const firebaseConfig = {
+      apiKey: "PASTE_YOUR_API_KEY",
+      authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "PASTE_YOUR_PROJECT_ID",
+      storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+      messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
+      appId: "PASTE_YOUR_APP_ID"
+    };
+
+    // STEP B: Use the same admin email in Firestore Rules.
+    const ADMIN_EMAIL = "your-admin-email@example.com";
+
+    const STATUSES = [
+      "Pending",
+      "Confirmed",
+      "Preparing",
+      "Out for Delivery",
+      "Delivered",
+      "Cancelled"
+    ];
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginPanel = document.getElementById("loginPanel");
+    const ordersPanel = document.getElementById("ordersPanel");
+    const loginForm = document.getElementById("loginForm");
+    const loginMessage = document.getElementById("loginMessage");
+    const pageMessage = document.getElementById("pageMessage");
+    const ordersList = document.getElementById("ordersList");
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function showMessage(element, message, isError = false) {
+      element.textContent = message;
+      element.className = isError ? "error" : "success";
+    }
+
+    function isAuthorized(user) {
+      return Boolean(
+        user &&
+        user.email &&
+        user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
+        user.emailVerified
+      );
+    }
+
+    loginForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const button = document.getElementById("loginButton");
+
+      button.disabled = true;
+      showMessage(loginMessage, "Signing in...");
+
+      try {
+        const result = await signInWithEmailAndPassword(
+          auth, email, password
+        );
+
+        if (!isAuthorized(result.user)) {
+          await signOut(auth);
+          showMessage(
+            loginMessage,
+            "This account is not the authorized, verified admin account.",
+            true
+          );
+        }
+      } catch (error) {
+        showMessage(
+          loginMessage,
+          "Login failed: " + error.message,
+          true
+        );
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById("logoutButton").addEventListener(
+      "click", async () => {
+        await signOut(auth);
+      }
+    );
+
+    document.getElementById("refreshButton").addEventListener(
+      "click", loadOrders
+    );
+
+    onAuthStateChanged(auth, async user => {
+      if (user && isAuthorized(user)) {
+        loginPanel.classList.add("hidden");
+        ordersPanel.classList.remove("hidden");
+        document.getElementById("signedInAs").textContent =
+          "Signed in as " + user.email;
+        await loadOrders();
+      } else {
+        ordersPanel.classList.add("hidden");
+        loginPanel.classList.remove("hidden");
+        ordersList.replaceChildren();
+
+        if (user) {
+          await signOut(auth);
+          showMessage(
+            loginMessage,
+            "Access denied. Use the verified admin account.",
+            true
+          );
+        }
+      }
+    });
+
+    async function loadOrders() {
+      ordersList.replaceChildren();
+      showMessage(pageMessage, "Loading orders...");
+
+      try {
+        const ordersQuery = query(
+          collection(db, "orders"),
+          orderBy("createdAt", "desc")
+        );
+        const snapshot = await getDocs(ordersQuery);
+
+        if (snapshot.empty) {
+          showMessage(pageMessage, "No orders found.");
+          return;
+        }
+
+        showMessage(pageMessage, "Orders found: " + snapshot.size);
+
+        snapshot.forEach(orderDoc => {
+          const order = orderDoc.data();
+          const card = document.createElement("article");
+          card.className = "order";
+
+          const items = Array.isArray(order.items) ? order.items : [];
+          const itemsHTML = items.map(item => `
+            <li>${escapeHTML(item.name)} ×
+              ${escapeHTML(item.quantity)} —
+              ₹${escapeHTML(
+                Number(item.unitPrice || 0) *
+                Number(item.quantity || 0)
+              )}</li>
+          `).join("");
+
+          const date = order.createdAt
+            ? new Date(Number(order.createdAt)).toLocaleString()
+            : "Not available";
+
+          const currentStatus = STATUSES.includes(order.status)
+            ? order.status
+            : "Pending";
+
+          card.innerHTML = `
+            <h3>Order ID: ${escapeHTML(orderDoc.id)}</h3>
+            <div class="details">
+              <b>Customer:</b> ${escapeHTML(order.customerName)}<br>
+              <b>Phone:</b> ${escapeHTML(order.phone)}<br>
+              <b>Address:</b> ${escapeHTML(order.address)}<br>
+              <b>Total:</b> ₹${escapeHTML(order.totalPrice)}<br>
+              <b>Created:</b> ${escapeHTML(date)}
+            </div>
+            <h4>Items</h4>
+            <ul class="item-list">${itemsHTML || "<li>No items</li>"}</ul>
+            <label>Status</label>
+            <div class="status-row">
+              <select class="statusSelect" aria-label="Order status">
+                ${STATUSES.map(status => `
+                  <option value="${escapeHTML(status)}"
+                    ${status === currentStatus ? "selected" : ""}>
+                    ${escapeHTML(status)}
+                  </option>
+                `).join("")}
+              </select>
+              <button class="saveStatus">Save Status</button>
+            </div>
+            <p class="orderMessage muted" role="status"></p>
+          `;
+
+          const select = card.querySelector(".statusSelect");
+          const saveButton = card.querySelector(".saveStatus");
+          const message = card.querySelector(".orderMessage");
+
+          saveButton.addEventListener("click", async () => {
+            const user = auth.currentUser;
+            if (!isAuthorized(user)) {
+              showMessage(message, "Admin login required.", true);
+              return;
+            }
+
+            saveButton.disabled = true;
+            try {
+              await updateDoc(doc(db, "orders", orderDoc.id), {
+                status: select.value
+              });
+              showMessage(message, "Status updated successfully.");
+            } catch (error) {
+              showMessage(
+                message,
+                "Update failed: " + error.message,
+                true
+              );
+            } finally {
+              saveButton.disabled = false;
+            }
+          });
+
+          ordersList.appendChild(card);
+        });
+      } catch (error) {
+        showMessage(
+          pageMessage,
+          "Could not load orders: " + error.message,
+          true
+        );
+      }
+    }
+  </script>
+</body>
+</html>
