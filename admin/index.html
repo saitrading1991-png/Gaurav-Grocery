@@ -146,11 +146,13 @@
     }
 
     function isAuthorized(user) {
-  return Boolean(
-    user &&
-    user.email &&
-    user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()
-  );
+  const userEmail = (user?.email || "").trim().toLowerCase();
+  const adminEmail = ADMIN_EMAIL.trim().toLowerCase();
+
+  console.log("Logged-in email:", userEmail);
+  console.log("Configured admin email:", adminEmail);
+
+  return userEmail !== "" && userEmail === adminEmail;
     }
 
     loginForm.addEventListener("submit", async event => {
@@ -168,12 +170,14 @@
         );
 
         if (!isAuthorized(result.user)) {
-          await signOut(auth);
-          showMessage(
-            loginMessage,
-            "This account is not the authorized, verified admin account.",
-            true
-          );
+  await signOut(auth);
+  showMessage(
+    loginMessage,
+    "Email does not match the configured admin email.",
+    true
+  );
+} else {
+  showMessage(loginMessage, "Login successful.");
         }
       } catch (error) {
         showMessage(
@@ -292,8 +296,7 @@
 
           saveButton.addEventListener("click", async () => {
             const user = auth.currentUser;
-            console.log("Login email:", result.user.email);
-console.log("Configured admin email:", ADMIN_EMAIL);
+            
             if (!isAuthorized(user)) {
               showMessage(message, "Admin login required.", true);
               return;
