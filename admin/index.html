@@ -170,13 +170,21 @@
         );
 
         if (!isAuthorized(result.user)) {
+  const actualEmail = result.user.email || "(email missing)";
+  const configuredEmail = ADMIN_EMAIL;
+
   await signOut(auth);
+
   showMessage(
     loginMessage,
-    "Email does not match the configured admin email.",
+    "Email mismatch.\n" +
+    "Firebase email: " + actualEmail + "\n" +
+    "Admin email in code: " + configuredEmail,
     true
   );
 } else {
+  showMessage(loginMessage, "Login successful.");
+        }else {
   showMessage(loginMessage, "Login successful.");
         }
       } catch (error) {
