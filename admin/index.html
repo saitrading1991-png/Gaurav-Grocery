@@ -2,281 +2,152 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gaurav Grocery | Admin Panel</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gaurav Grocery Admin</title>
   <style>
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f6f4;
-      color: #203128;
-    }
-
-    header {
-      background: #146c43;
-      color: white;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    header h1 { margin: 0; font-size: 22px; }
-
-    main {
-      width: min(1100px, 94%);
-      margin: 24px auto;
-    }
-
-    .panel, .card {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 3px 12px #0000000b;
-    }
-
-    h2 { margin-top: 0; }
-
-    label {
-      display: block;
-      margin: 12px 0 6px;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccd6cf;
-      border-radius: 7px;
-      font-size: 15px;
-      background: white;
-    }
-
-    textarea {
-      min-height: 75px;
-      resize: vertical;
-    }
-
-    button {
-      border: 0;
-      border-radius: 7px;
-      padding: 11px 15px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      background: #146c43;
-      color: white;
-      margin: 5px 5px 5px 0;
-    }
-
-    button:hover { opacity: .9; }
-    button:disabled { opacity: .5; cursor: wait; }
-
+    body { margin: 0; font-family: Arial, sans-serif; background: #f2f6f3; color: #203128; }
+    header { background: #146c43; color: white; padding: 18px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    h1 { font-size: 22px; margin: 0; }
+    main { width: min(1050px, 94%); margin: 24px auto; }
+    .panel, .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 18px; box-shadow: 0 2px 10px #0000000b; }
+    label { display: block; font-weight: bold; margin: 12px 0 6px; }
+    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccd6cf; border-radius: 7px; font-size: 15px; }
+    button { padding: 11px 15px; border: 0; border-radius: 7px; background: #146c43; color: white; font-weight: bold; cursor: pointer; margin: 5px 5px 5px 0; }
+    button:disabled { opacity: .55; }
     .secondary { background: #52645a; }
-    .danger { background: #c62828; }
-    .warning { background: #a76500; }
+    .danger { background: #b42318; }
+    .warning { background: #9a6500; }
     .hidden { display: none !important; }
-
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .tabs button { margin: 0; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 15px;
-    }
-
-    .card h3 { margin-top: 0; }
-    .muted { color: #66756b; font-size: 14px; }
-    .price { font-size: 20px; font-weight: bold; color: #146c43; }
-    .status { font-weight: bold; }
-    .message { margin-top: 12px; font-weight: bold; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .muted { color: #637267; font-size: 14px; }
+    .message { overflow-wrap: anywhere; font-weight: bold; }
+    .error { color: #b42318; }
     .success { color: #146c43; }
-    .error { color: #c62828; }
-    .empty { padding: 18px; color: #66756b; }
-
-    @media (max-width: 500px) {
-      header h1 { font-size: 19px; }
-      .panel, .card { padding: 15px; }
-    }
+    .price { color: #146c43; font-size: 20px; font-weight: bold; }
   </style>
 </head>
-
 <body>
-  <header>
-    <h1>🛒 Gaurav Grocery Admin</h1>
-    <button id="logoutBtn" class="secondary hidden">Logout</button>
-  </header>
+<header>
+  <h1>🛒 Gaurav Grocery Admin</h1>
+  <button id="logoutBtn" class="secondary hidden" type="button">Logout</button>
+</header>
 
-  <main>
-    <!-- LOGIN -->
-    <section id="loginPanel" class="panel">
-      <h2>Admin Login</h2>
-      <p class="muted">Sirf authorised admin account se login karein.</p>
+<main>
+  <section id="loginPanel" class="panel">
+    <h2>Admin Login</h2>
+    <p class="muted">Firebase Authentication se login karein.</p>
+    <form id="loginForm">
+      <label for="email">Admin Email</label>
+      <input id="email" type="email" value="sai.trading1991@gmail.com" required autocomplete="username">
 
-      <form id="loginForm">
-        <label for="email">Admin Email</label>
-        <input
-          id="email"
-          type="email"
-          value="sai.trading1991@gmail.com"
-          required
-          autocomplete="username"
-        >
+      <label for="password">Password</label>
+      <input id="password" type="password" required autocomplete="current-password">
 
-        <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          required
-          autocomplete="current-password"
-        >
+      <button id="loginBtn" type="submit"
+        onclick="document.getElementById('loginMessage').textContent='Login button working; checking Firebase…'">
+        Login
+      </button>
+    </form>
+    <p id="loginMessage" class="message" role="status">Loading login system…</p>
+  </section>
 
-        <button id="loginBtn" type="submit">Login</button>
-      </form>
+  <section id="adminPanel" class="hidden">
+    <div class="tabs">
+      <button id="ordersTab" type="button">📦 Orders</button>
+      <button id="productsTab" type="button">🛍️ Products</button>
+    </div>
 
-      <p id="loginMessage" class="message" role="status"></p>
+    <section id="ordersPanel" class="panel">
+      <h2>Customer Orders</h2>
+      <p id="ordersMessage" class="message" role="status"></p>
+      <div id="ordersList" class="grid"></div>
     </section>
 
-    <!-- ADMIN APP -->
-    <section id="adminPanel" class="hidden">
-      <div class="tabs">
-        <button id="ordersTab">📦 Orders</button>
-        <button id="productsTab">🛍️ Products</button>
+    <section id="productsPanel" class="hidden">
+      <div class="panel">
+        <h2 id="formTitle">Add Product</h2>
+        <form id="productForm">
+          <input id="productId" type="hidden">
+
+          <label for="productName">Product Name *</label>
+          <input id="productName" required maxlength="100">
+
+          <label for="productCategory">Category *</label>
+          <input id="productCategory" required maxlength="60">
+
+          <label for="productUnit">Unit *</label>
+          <input id="productUnit" required maxlength="40" placeholder="1 kg, 500 g, 1 litre">
+
+          <label for="productPrice">Price (₹) *</label>
+          <input id="productPrice" type="number" min="0.01" step="0.01" required>
+
+          <label for="productEmoji">Emoji</label>
+          <input id="productEmoji" value="🛒" maxlength="20">
+
+          <label for="productImage">Image URL (optional)</label>
+          <input id="productImage" type="url" placeholder="https://example.com/image.jpg">
+
+          <label for="productDescription">Description</label>
+          <textarea id="productDescription" maxlength="500"></textarea>
+
+          <label><input id="productStock" type="checkbox" checked style="width:auto"> In Stock</label>
+
+          <button id="saveProductBtn" type="submit">Add Product</button>
+          <button id="cancelEditBtn" class="secondary hidden" type="button">Cancel Edit</button>
+        </form>
+        <p id="productMessage" class="message" role="status"></p>
       </div>
 
-      <!-- ORDERS -->
-      <section id="ordersPanel">
-        <div class="panel">
-          <h2>Customer Orders</h2>
-          <p id="ordersMessage" class="message" role="status"></p>
-          <div id="ordersList" class="grid">
-            <p class="empty">Orders load ho rahe hain...</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- PRODUCTS -->
-      <section id="productsPanel" class="hidden">
-        <div class="panel">
-          <h2 id="productFormTitle">Add New Product</h2>
-
-          <form id="productForm">
-            <input id="productId" type="hidden">
-
-            <label for="productName">Product Name *</label>
-            <input id="productName" required maxlength="100"
-              placeholder="e.g. Aashirvaad Atta">
-
-            <label for="productCategory">Category *</label>
-            <input id="productCategory" required maxlength="60"
-              placeholder="e.g. Atta & Rice">
-
-            <label for="productUnit">Unit *</label>
-            <input id="productUnit" required maxlength="40"
-              placeholder="e.g. 5 kg, 1 litre, 500 g">
-
-            <label for="productPrice">Price (₹) *</label>
-            <input id="productPrice" type="number"
-              min="0.01" max="10000000" step="0.01" required>
-
-            <label for="productEmoji">Product Emoji</label>
-            <input id="productEmoji" value="🛒" maxlength="20">
-
-            <label for="productImage">Product Image URL (optional)</label>
-            <input id="productImage" type="url"
-              placeholder="https://example.com/product.jpg">
-
-            <label for="productDescription">Description (optional)</label>
-            <textarea id="productDescription" maxlength="500"
-              placeholder="Product details"></textarea>
-
-            <label>
-              <input id="productInStock" type="checkbox"
-                checked style="width:auto">
-              In Stock
-            </label>
-
-            <div style="margin-top:15px">
-              <button id="saveProductBtn" type="submit">Add Product</button>
-              <button id="cancelEditBtn" type="button"
-                class="secondary hidden">Cancel Edit</button>
-            </div>
-          </form>
-
-          <p id="productMessage" class="message" role="status"></p>
-        </div>
-
-        <div class="panel">
-          <h2>All Products</h2>
-          <p id="productCount" class="muted"></p>
-          <div id="productList" class="grid">
-            <p class="empty">Products load ho rahe hain...</p>
-          </div>
-        </div>
-      </section>
+      <div class="panel">
+        <h2>All Products</h2>
+        <p id="productCount" class="muted"></p>
+        <div id="productList" class="grid"></div>
+      </div>
     </section>
-  </main>
+  </section>
+</main>
 
 <script>
-  window.addEventListener("error", function (event) {
-    var message = document.getElementById("loginMessage");
-    if (message) {
-      message.textContent =
-        "JavaScript error: " + (event.message || "Script load failed");
-      message.style.color = "red";
+  // Ye message Firebase module load hone se pehle bhi kaam karega.
+  window.addEventListener("error", function(e) {
+    const el = document.getElementById("loginMessage");
+    if (el) {
+      el.textContent = "JavaScript load error: " + (e.message || "Script failed");
+      el.className = "message error";
     }
   });
-
-  window.addEventListener("unhandledrejection", function (event) {
-    var message = document.getElementById("loginMessage");
-    if (message) {
-      message.textContent =
-        "Firebase error: " +
-        (event.reason?.message || String(event.reason));
-      message.style.color = "red";
+  window.addEventListener("unhandledrejection", function(e) {
+    const el = document.getElementById("loginMessage");
+    if (el) {
+      el.textContent = "Firebase error: " +
+        (e.reason?.message || String(e.reason));
+      el.className = "message error";
     }
   });
 </script>
-  
-  <script type="module">
-    import { initializeApp } from
-      "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut
-    } from
-      "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+<script type="module">
+  const loginMessage = document.getElementById("loginMessage");
+  loginMessage.textContent = "Firebase scripts loading…";
 
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      addDoc,
-      doc,
-      updateDoc,
-      deleteDoc,
-      query,
-      orderBy
-    } from
-      "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+  try {
+    const { initializeApp } = await import(
+      "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js"
+    );
+    const {
+      getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+    } = await import(
+      "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js"
+    );
+    const {
+      getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
+      doc, query, orderBy
+    } = await import(
+      "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js"
+    );
 
-    // Firebase project configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBNDAZ89Q_ms4tsAGI3r5m_4ftqucQJHvc",
       authDomain: "gaurav-grocery.firebaseapp.com",
@@ -288,373 +159,337 @@
     };
 
     const ADMIN_EMAIL = "sai.trading1991@gmail.com";
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
     const $ = id => document.getElementById(id);
-
-    const loginPanel = $("loginPanel");
-    const adminPanel = $("adminPanel");
-    const ordersPanel = $("ordersPanel");
-    const productsPanel = $("productsPanel");
 
     let currentUser = null;
     let productsCache = [];
 
-    function showMessage(id, message, isError = false) {
-      const el = $(id);
-      el.textContent = message;
-      el.className = "message " + (isError ? "error" : "success");
+    function message(id, text, error = false) {
+      $(id).textContent = text;
+      $(id).className = "message " + (error ? "error" : "success");
     }
 
-    function escapeHTML(value) {
-      return String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[char]);
+    function esc(v) {
+      return String(v ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#39;"
+      })[c]);
     }
 
-    function money(value) {
-      const amount = Number(value);
-      return "₹" + (Number.isFinite(amount) ? amount : 0).toLocaleString(
-        "en-IN", { maximumFractionDigits: 2 }
-      );
+    function money(v) {
+      const n = Number(v);
+      return "₹" + (Number.isFinite(n) ? n : 0).toLocaleString("en-IN");
     }
 
-    function dateText(value) {
-      if (value && typeof value.toDate === "function") {
-        return value.toDate().toLocaleString("en-IN");
+    function dateText(v) {
+      if (v && typeof v.toDate === "function") v = v.toDate();
+      else if (typeof v === "number") v = new Date(v);
+      else if (typeof v === "string") v = new Date(v);
+      return v instanceof Date && !Number.isNaN(v.getTime())
+        ? v.toLocaleString("en-IN") : "Date unavailable";
+    }
+
+    function adminCheck() {
+      if (!currentUser || currentUser.email?.toLowerCase() !== ADMIN_EMAIL) {
+        throw new Error("Admin account se login karein.");
       }
-
-      if (typeof value === "number" && Number.isFinite(value)) {
-        return new Date(value).toLocaleString("en-IN");
-      }
-
-      if (typeof value === "string" && value) {
-        const parsed = new Date(value);
-        if (!Number.isNaN(parsed.getTime())) {
-          return parsed.toLocaleString("en-IN");
-        }
-      }
-
-      return "Date unavailable";
     }
 
-    // LOGIN
-    $("loginForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      $("loginBtn").disabled = true;
-      showMessage("loginMessage", "Logging in...");
+    $("loginForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const btn = $("loginBtn");
+      btn.disabled = true;
+      message("loginMessage", "Firebase login ho raha hai…");
 
       try {
         const email = $("email").value.trim().toLowerCase();
         const password = $("password").value;
 
         if (email !== ADMIN_EMAIL) {
-          throw new Error("Is email ko admin access nahi diya gaya hai.");
+          throw new Error("Admin email sahi enter karein: " + ADMIN_EMAIL);
         }
 
         await signInWithEmailAndPassword(auth, email, password);
         $("password").value = "";
-      } catch (error) {
-        showMessage(
-          "loginMessage",
-          error.code === "auth/invalid-credential"
-            ? "Email ya password galat hai."
-            : error.message || "Login failed.",
-          true
-        );
+        message("loginMessage", "Login successful.");
+      } catch (err) {
+        const errors = {
+          "auth/invalid-credential": "Email ya password galat hai.",
+          "auth/invalid-email": "Email address sahi nahi hai.",
+          "auth/user-not-found": "Firebase Authentication mein user nahi mila.",
+          "auth/wrong-password": "Password galat hai.",
+          "auth/too-many-requests": "Bahut attempts hue. Thodi der baad try karein.",
+          "auth/network-request-failed": "Internet connection check karein.",
+          "auth/operation-not-allowed": "Firebase mein Email/Password sign-in enable karein.",
+          "auth/unauthorized-domain": "Firebase Authentication ke Authorized domains mein sait rading1991-png.github.io add karein."
+        };
+        message("loginMessage",
+          errors[err.code] || (err.code ? err.code + ": " : "") +
+          (err.message || "Login failed."), true);
       } finally {
-        $("loginBtn").disabled = false;
+        btn.disabled = false;
       }
     });
 
-    $("logoutBtn").addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        alert("Logout error: " + error.message);
-      }
-    });
+    $("logoutBtn").addEventListener("click", () => signOut(auth));
 
-    // TABS
     $("ordersTab").addEventListener("click", () => {
-      ordersPanel.classList.remove("hidden");
-      productsPanel.classList.add("hidden");
+      $("ordersPanel").classList.remove("hidden");
+      $("productsPanel").classList.add("hidden");
       loadOrders();
     });
 
     $("productsTab").addEventListener("click", () => {
-      ordersPanel.classList.add("hidden");
-      productsPanel.classList.remove("hidden");
+      $("ordersPanel").classList.add("hidden");
+      $("productsPanel").classList.remove("hidden");
       loadProducts();
     });
 
-    // Only signed-in admin can perform panel actions.
-    function requireAdmin() {
-      if (!currentUser ||
-          currentUser.email?.toLowerCase() !== ADMIN_EMAIL) {
-        throw new Error("Admin permission required. Please login again.");
-      }
-    }
-
-    // ORDERS
     async function loadOrders() {
       try {
-        requireAdmin();
-        $("ordersMessage").textContent = "Orders load ho rahe hain...";
+        adminCheck();
+        message("ordersMessage", "Orders load ho rahe hain…");
 
-        let snapshot;
-
+        let snap;
         try {
-          snapshot = await getDocs(
-            query(collection(db, "orders"), orderBy("createdAt", "desc"))
-          );
-        } catch (error) {
-          // Fallback if some older orders do not have createdAt.
-          if (error.code === "permission-denied") throw error;
-          snapshot = await getDocs(collection(db, "orders"));
+          snap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc")));
+        } catch (err) {
+          if (err.code === "permission-denied") throw err;
+          snap = await getDocs(collection(db, "orders"));
         }
 
-        const orders = snapshot.docs.map(orderDoc => ({
-          id: orderDoc.id,
-          ...orderDoc.data()
-        }));
-
-        orders.sort((a, b) => {
-          const time = value => {
-            if (typeof value === "number") return value;
-            if (value && typeof value.toMillis === "function") {
-              return value.toMillis();
-            }
-            return 0;
-          };
-          return time(b.createdAt) - time(a.createdAt);
-        });
+        const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        orders.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
 
         const list = $("ordersList");
         list.replaceChildren();
 
-        if (!orders.length) {
-          list.innerHTML = '<p class="empty">Abhi koi order nahi hai.</p>';
-        }
+        if (!orders.length) list.innerHTML = "<p>No orders yet.</p>";
 
-        for (const order of orders) {
-          const card = document.createElement("article");
+        const statuses = ["Pending", "Confirmed", "Processing",
+          "Out for Delivery", "Delivered", "Cancelled"];
+
+        orders.forEach(o => {
+          const card = document.createElement("div");
           card.className = "card";
-
-          const items = Array.isArray(order.items) ? order.items : [];
-          const itemsHTML = items.map(item => `
-            <li>${escapeHTML(item.name || item.productName || item.productId || "Product")}
-              × ${escapeHTML(item.quantity ?? 1)}
-              — ${money((Number(item.unitPrice) || 0) *
-                (Number(item.quantity) || 1))}
-            </li>
-          `).join("");
-
-          const status = String(order.status || "Pending");
-          const statuses = ["Pending", "Confirmed", "Processing",
-            "Out for Delivery", "Delivered", "Cancelled"];
+          const items = Array.isArray(o.items) ? o.items : [];
 
           card.innerHTML = `
-            <h3>Order #${escapeHTML(order.id)}</h3>
-            <p><strong>Customer:</strong>
-              ${escapeHTML(order.customerName || "N/A")}</p>
-            <p><strong>Phone:</strong>
-              ${escapeHTML(order.phone || "N/A")}</p>
-            <p><strong>Address:</strong>
-              ${escapeHTML(order.address || "N/A")}</p>
-            <p><strong>Date:</strong>
-              ${escapeHTML(dateText(order.createdAt))}</p>
-            <p><strong>Items:</strong></p>
-            <ul>${itemsHTML || "<li>No item details</li>"}</ul>
-            <p class="price">Total: ${money(order.totalPrice)}</p>
-            <p>Status: <span class="status">${escapeHTML(status)}</span></p>
-            <label>Update Status</label>
-            <select class="order-status">
-              ${statuses.map(s =>
-                `<option value="${escapeHTML(s)}"
-                  ${s === status ? "selected" : ""}>
-                  ${escapeHTML(s)}
-                </option>`
-              ).join("")}
-              ${statuses.includes(status) ? "" :
-                `<option selected value="${escapeHTML(status)}">
-                  ${escapeHTML(status)}
-                </option>`}
+            <h3>Order #${esc(o.id)}</h3>
+            <p><b>Customer:</b> ${esc(o.customerName || "N/A")}</p>
+            <p><b>Phone:</b> ${esc(o.phone || "N/A")}</p>
+            <p><b>Address:</b> ${esc(o.address || "N/A")}</p>
+            <p><b>Date:</b> ${esc(dateText(o.createdAt))}</p>
+            <ul>${items.map(i => `<li>${esc(i.name || i.productId || "Product")}
+              × ${esc(i.quantity ?? 1)}</li>`).join("")}</ul>
+            <p class="price">Total: ${money(o.totalPrice)}</p>
+            <label>Status</label>
+            <select class="status">
+              ${statuses.map(s => `<option ${s === (o.status || "Pending") ? "selected" : ""}>${s}</option>`).join("")}
+              ${statuses.includes(o.status) || !o.status ? "" : `<option selected>${esc(o.status)}</option>`}
             </select>
-            <button class="save-status">Save Status</button>
+            <button class="save">Save Status</button>
           `;
 
-          card.querySelector(".save-status").addEventListener("click",
-            async event => {
-              const button = event.currentTarget;
-              button.disabled = true;
-
-              try {
-                requireAdmin();
-                const newStatus = card.querySelector(".order-status").value;
-                await updateDoc(doc(db, "orders", order.id), {
-                  status: newStatus
-                });
-                showMessage("ordersMessage", "Order status updated.");
-                await loadOrders();
-              } catch (error) {
-                showMessage("ordersMessage",
-                  "Status update failed: " + error.message, true);
-                button.disabled = false;
-              }
-            });
-
+          card.querySelector(".save").addEventListener("click", async e => {
+            e.currentTarget.disabled = true;
+            try {
+              adminCheck();
+              await updateDoc(doc(db, "orders", o.id), {
+                status: card.querySelector(".status").value
+              });
+              message("ordersMessage", "Order status updated.");
+              await loadOrders();
+            } catch (err) {
+              message("ordersMessage", err.message, true);
+              e.currentTarget.disabled = false;
+            }
+          });
           list.appendChild(card);
-        }
+        });
 
-        $("ordersMessage").textContent = `Total orders: ${orders.length}`;
-        $("ordersMessage").className = "message success";
-      } catch (error) {
-        showMessage("ordersMessage",
-          "Orders load nahi hue: " + error.message, true);
-        $("ordersList").innerHTML =
-          '<p class="empty">Firebase rules aur connection check karein.</p>';
+        message("ordersMessage", "Total orders: " + orders.length);
+      } catch (err) {
+        message("ordersMessage", "Orders error: " + err.message, true);
       }
     }
 
-    // PRODUCTS
+    function resetForm() {
+      $("productForm").reset();
+      $("productId").value = "";
+      $("productEmoji").value = "🛒";
+      $("productStock").checked = true;
+      $("formTitle").textContent = "Add Product";
+      $("saveProductBtn").textContent = "Add Product";
+      $("cancelEditBtn").classList.add("hidden");
+    }
+
+    $("cancelEditBtn").addEventListener("click", resetForm);
+
     async function loadProducts() {
       try {
-        requireAdmin();
-        $("productList").innerHTML =
-          '<p class="empty">Products load ho rahe hain...</p>';
+        adminCheck();
+        const snap = await getDocs(collection(db, "products"));
+        productsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        productsCache.sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
 
-        const snapshot = await getDocs(collection(db, "products"));
-
-        productsCache = snapshot.docs.map(productDoc => ({
-          id: productDoc.id,
-          ...productDoc.data()
-        }));
-
-        productsCache.sort((a, b) =>
-          String(a.name || "").localeCompare(String(b.name || ""))
-        );
-
-        $("productCount").textContent =
-          `Total products: ${productsCache.length}`;
-
+        $("productCount").textContent = "Total products: " + productsCache.length;
         const list = $("productList");
         list.replaceChildren();
 
-        if (!productsCache.length) {
-          list.innerHTML =
-            '<p class="empty">Abhi product nahi hai. Upar form se add karein.</p>';
-          return;
-        }
+        if (!productsCache.length) list.innerHTML = "<p>No products yet. Add your first product above.</p>";
 
-        for (const product of productsCache) {
-          const card = document.createElement("article");
+        productsCache.forEach(p => {
+          const card = document.createElement("div");
           card.className = "card";
-
-          const emoji = escapeHTML(product.emoji || "🛒");
-          const imageUrl = typeof product.imageUrl === "string"
-            ? product.imageUrl.trim() : "";
-
-          // Only display HTTP(S) images.
-          let safeImage = "";
+          const inStock = p.inStock !== false;
+          const active = p.active !== false;
+          let image = "";
           try {
-            const url = new URL(imageUrl);
-            if (url.protocol === "https:" || url.protocol === "http:") {
-              safeImage = url.href;
-            }
+            const u = new URL(p.imageUrl || "");
+            if (["https:", "http:"].includes(u.protocol)) image = u.href;
           } catch (_) {}
 
-          const stock = product.inStock !== false;
-          const active = product.active !== false;
-
           card.innerHTML = `
-            ${safeImage
-              ? `<img src="${escapeHTML(safeImage)}"
-                  alt="${escapeHTML(product.name || "Product")}"
-                  loading="lazy"
-                  style="width:100%;height:150px;object-fit:contain"
-                  onerror="this.style.display='none'">`
-              : `<div style="font-size:48px;text-align:center;padding:12px">
-                  ${emoji}</div>`}
-            <h3>${escapeHTML(product.name || "Unnamed Product")}</h3>
-            <p class="muted">${escapeHTML(product.category || "Uncategorized")}
-              · ${escapeHTML(product.unit || "")}</p>
-            <p class="price">${money(product.price)}</p>
-            <p>Stock: <strong>${stock ? "In Stock" : "Out of Stock"}</strong></p>
-            <p>Visibility: <strong>${active ? "Active" : "Hidden"}</strong></p>
-            <p>${escapeHTML(product.description || "")}</p>
-            <button class="edit-product">Edit</button>
-            <button class="stock-product ${stock ? "warning" : ""}">
-              ${stock ? "Mark Out of Stock" : "Mark In Stock"}
-            </button>
-            <button class="visibility-product secondary">
-              ${active ? "Hide Product" : "Show Product"}
-            </button>
-            <button class="delete-product danger">Delete</button>
+            ${image ? `<img src="${esc(image)}" alt="" style="width:100%;height:140px;object-fit:contain">` : `<div style="font-size:42px">${esc(p.emoji || "🛒")}</div>`}
+            <h3>${esc(p.name || "Unnamed Product")}</h3>
+            <p>${esc(p.category || "")} · ${esc(p.unit || "")}</p>
+            <p class="price">${money(p.price)}</p>
+            <p>Stock: ${inStock ? "In Stock" : "Out of Stock"}</p>
+            <p>Visibility: ${active ? "Active" : "Hidden"}</p>
+            <p>${esc(p.description || "")}</p>
+            <button class="edit">Edit</button>
+            <button class="stock warning">${inStock ? "Out of Stock" : "In Stock"}</button>
+            <button class="visibility secondary">${active ? "Hide" : "Show"}</button>
+            <button class="delete danger">Delete</button>
           `;
 
-          card.querySelector(".edit-product").addEventListener("click", () => {
-            $("productId").value = product.id;
-            $("productName").value = product.name || "";
-            $("productCategory").value = product.category || "";
-            $("productUnit").value = product.unit || "";
-            $("productPrice").value = Number(product.price) || "";
-            $("productEmoji").value = product.emoji || "🛒";
-            $("productImage").value = product.imageUrl || "";
-            $("productDescription").value = product.description || "";
-            $("productInStock").checked = stock;
-            $("productFormTitle").textContent = "Edit Product";
+          card.querySelector(".edit").addEventListener("click", () => {
+            $("productId").value = p.id;
+            $("productName").value = p.name || "";
+            $("productCategory").value = p.category || "";
+            $("productUnit").value = p.unit || "";
+            $("productPrice").value = p.price ?? "";
+            $("productEmoji").value = p.emoji || "🛒";
+            $("productImage").value = p.imageUrl || "";
+            $("productDescription").value = p.description || "";
+            $("productStock").checked = inStock;
+            $("formTitle").textContent = "Edit Product";
             $("saveProductBtn").textContent = "Save Changes";
             $("cancelEditBtn").classList.remove("hidden");
-
             window.scrollTo({ top: 0, behavior: "smooth" });
           });
 
-          card.querySelector(".stock-product").addEventListener("click",
-            () => updateProduct(product.id, {
-              inStock: !stock,
-              updatedAt: Date.now()
-            }, "Stock updated."));
+          card.querySelector(".stock").addEventListener("click", () =>
+            updateProduct(p.id, { inStock: !inStock, updatedAt: Date.now() }));
 
-          card.querySelector(".visibility-product").addEventListener("click",
-            () => updateProduct(product.id, {
-              active: !active,
-              updatedAt: Date.now()
-            }, "Product visibility updated."));
+          card.querySelector(".visibility").addEventListener("click", () =>
+            updateProduct(p.id, { active: !active, updatedAt: Date.now() }));
 
-          card.querySelector(".delete-product").addEventListener("click",
-            async () => {
-              if (!confirm(
-                `Kya aap "${product.name || "this product"}" delete karna chahte hain?`
-              )) return;
-
-              try {
-                requireAdmin();
-                await deleteDoc(doc(db, "products", product.id));
-                showMessage("productMessage", "Product deleted.");
-                await loadProducts();
-              } catch (error) {
-                showMessage("productMessage",
-                  "Delete failed: " + error.message, true);
-              }
-            });
-
+          card.querySelector(".delete").addEventListener("click", async () => {
+            if (!confirm(`Delete "${p.name || "this product"}"?`)) return;
+            try {
+              adminCheck();
+              await deleteDoc(doc(db, "products", p.id));
+              message("productMessage", "Product deleted.");
+              await loadProducts();
+            } catch (err) {
+              message("productMessage", "Delete error: " + err.message, true);
+            }
+          });
           list.appendChild(card);
-        }
-      } catch (error) {
-        $("productList").innerHTML =
-          '<p class="empty">Products load nahi hue.</p>';
-        showMessage("productMessage",
-          "Error: " + error.message +
-          ". Firestore products rules check karein.", true);
+        });
+        message("productMessage", "Products loaded.");
+      } catch (err) {
+        message("productMessage", "Products error: " + err.message, true);
       }
     }
 
-    async function updateProduct(id
+    async function updateProduct(id, data) {
+      try {
+        adminCheck();
+        await updateDoc(doc(db, "products", id), data);
+        message("productMessage", "Product updated.");
+        await loadProducts();
+      } catch (err) {
+        message("productMessage", "Update error: " + err.message, true);
+      }
+    }
+
+    $("productForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const btn = $("saveProductBtn");
+      btn.disabled = true;
+      try {
+        adminCheck();
+        const price = Number($("productPrice").value);
+        if (!Number.isFinite(price) || price <= 0) throw new Error("Price zero se zyada hona chahiye.");
+
+        const imageUrl = $("productImage").value.trim();
+        if (imageUrl) {
+          const u = new URL(imageUrl);
+          if (!["https:", "http:"].includes(u.protocol)) throw new Error("Image URL sahi nahi hai.");
+        }
+
+        const data = {
+          name: $("productName").value.trim(),
+          category: $("productCategory").value.trim(),
+          unit: $("productUnit").value.trim(),
+          price,
+          emoji: $("productEmoji").value.trim() || "🛒",
+          imageUrl,
+          description: $("productDescription").value.trim(),
+          inStock: $("productStock").checked,
+          updatedAt: Date.now()
+        };
+
+        const id = $("productId").value;
+        if (id) {
+          const old = productsCache.find(p => p.id === id);
+          data.active = old?.active !== false;
+          await updateDoc(doc(db, "products", id), data);
+          message("productMessage", "Product updated successfully.");
+        } else {
+          data.active = true;
+          data.createdAt = Date.now();
+          await addDoc(collection(db, "products"), data);
+          message("productMessage", "Product added successfully.");
+        }
+        resetForm();
+        await loadProducts();
+      } catch (err) {
+        message("productMessage", "Save error: " + err.message, true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    onAuthStateChanged(auth, async user => {
+      currentUser = user;
+      if (user && user.email?.toLowerCase() === ADMIN_EMAIL) {
+        $("loginPanel").classList.add("hidden");
+        $("adminPanel").classList.remove("hidden");
+        $("logoutBtn").classList.remove("hidden");
+        await loadOrders();
+        await loadProducts();
+      } else {
+        if (user) await signOut(auth);
+        $("loginPanel").classList.remove("hidden");
+        $("adminPanel").classList.add("hidden");
+        $("logoutBtn").classList.add("hidden");
+        if (user) message("loginMessage", "Is account ko admin access nahi hai.", true);
+        else message("loginMessage", "Login ke liye email aur password enter karein.");
+      }
+    });
+
+  } catch (err) {
+    loginMessage.textContent =
+      "Firebase JavaScript load nahi hui: " + (err.message || String(err));
+    loginMessage.className = "message error";
+  }
+</script>
+</body>
+</html>
