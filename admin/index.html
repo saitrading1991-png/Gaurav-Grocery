@@ -149,8 +149,8 @@
   const userEmail = (user?.email || "").trim().toLowerCase();
   const adminEmail = ADMIN_EMAIL.trim().toLowerCase();
 
-  console.log("Logged-in email:", userEmail);
-  console.log("Configured admin email:", adminEmail);
+  console.log("Firebase email:", JSON.stringify(userEmail));
+  console.log("Admin email:", JSON.stringify(adminEmail));
 
   return userEmail !== "" && userEmail === adminEmail;
     }
